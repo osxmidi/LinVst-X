@@ -10,6 +10,8 @@ It's best to use plugins that already run with LinVst and/or use TestVst to test
 
 LinVst-X usage is basically the same as LinVst except that linvst.so is linvstx.so
 
+The usual X11 and Wine dev packages and multilib are needed (details are in the LinVst Make Guide https://github.com/osxmidi/LinVst/tree/master/Make-Guide)
+
 See the convert folder Notes on how to make the linvstx.so renaming conversion utilities.
 
 The server can be killed when no plugins are loaded.
