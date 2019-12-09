@@ -8,9 +8,13 @@ Plugins running in one process are not sandboxed, so if one plugin crashes then 
 
 It's best to use plugins that already run with LinVst and/or use TestVst to test how a plugin might run under Wine.
 
-LinVst-X usage is basically the same as LinVst except that linvst.so is linvstx.so
+LinVst-X usage is basically the same as LinVst except that the file to be renamed to the vst dll name is linvstx.so (rather than linvst.so for LinVst).
 
-The usual X11 and Wine dev packages and multilib are needed (details are in the LinVst Make Guide https://github.com/osxmidi/LinVst/tree/master/Make-Guide)
+The usual X11 and Wine dev packages and multilib are needed (details are in the LinVst Make Guide https://github.com/osxmidi/LinVst/tree/master/Make-Guide) then
+
+make
+
+sudo make install
 
 See the convert folder Notes on how to make the linvstx.so renaming conversion utilities.
 
