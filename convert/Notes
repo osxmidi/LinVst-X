@@ -1,0 +1,13 @@
+The convert folder is for making the linvstxconvert and linvstxconverttree (navigates subfolders) utilities that name convert Windows vst dll filenames (.dll) to corresponding Linux shared library filenames (.so).
+
+Makefile makes linvstxconvert
+
+Makefile-linxconverttree make linvstxconverttree
+
+Makefiles need the gtk3 dev libraries
+
+--------
+
+The makegtk etc files in the convert folder contain simple commands for making the convert utilities.
+
+A -no-pie option might be needed on some systems for the linvstxconvert and linvstxconverttree utilities icons to appear.
