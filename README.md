@@ -2,13 +2,15 @@
 
 LinVst-X adds support for Windows vst's to be used in Linux vst capable DAW's.
 
-LinVst-X runs a single Wine process so plugins that communicate with each other or plugins that can use shared samples between instances will be able to communicate with their other instances.
+LinVst-X runs vst plugins in a single Wine process so plugins that communicate with each other or plugins that can use shared samples between instances will be able to communicate with their other instances.
 
 Plugins running in one process are not sandboxed, so if one plugin crashes then the whole lot might crash.
 
 It's best to use plugins that already run with LinVst and/or use TestVst to test how a plugin might run under Wine.
 
 LinVst-X usage is basically the same as LinVst except that linvst.so is linvstx.so
+
+See the convert folder Notes on how to make the linvstx.so renaming conversion utilities.
 
 The server can be killed when no plugins are loaded.
 
