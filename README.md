@@ -14,6 +14,8 @@ The LinVst-X server can be preloaded
 
 wine /usr/bin/lin-vst-server-x.exe.so
 
+LinVst-X binaries are at https://github.com/osxmidi/LinVst-X/releases
+
 The usual X11 and Wine dev packages and multilib are needed (details are in the LinVst Make Guide https://github.com/osxmidi/LinVst/tree/master/Make-Guide) then
 
 make
