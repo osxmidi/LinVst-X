@@ -12,7 +12,9 @@ LinVst-X usage is basically the same as LinVst except that the file to be rename
 
 The LinVst-X server can be preloaded
 
-wine /usr/bin/lin-vst-server-x.exe.so
+wine /usr/bin/lin-vst-server-x.exe.so for 64 bit plugins
+
+wine /usr/bin/lin-vst-server-x32.exe.so for 32 bit plugins
 
 LinVst-X binaries are at https://github.com/osxmidi/LinVst-X/releases
 
