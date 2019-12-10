@@ -10,6 +10,10 @@ It's best to use plugins that already run with LinVst and/or use TestVst to test
 
 LinVst-X usage is basically the same as LinVst except that the file to be renamed to the vst dll name is linvstx.so (rather than linvst.so for LinVst).
 
+The LinVst-X server can be preloaded
+
+wine /usr/bin/lin-vst-server-x.exe.so
+
 The usual X11 and Wine dev packages and multilib are needed (details are in the LinVst Make Guide https://github.com/osxmidi/LinVst/tree/master/Make-Guide) then
 
 make
