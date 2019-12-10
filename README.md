@@ -1,6 +1,6 @@
 # LinVst-X
 
-LinVst-X adds support for Windows vst's to be used in Linux vst capable DAW's.
+LinVst-X adds support for Windows vst plugins to be used in Linux vst capable DAW's.
 
 LinVst-X runs vst plugins in a single Wine process so plugins that communicate with each other or plugins that can use shared samples between instances will be able to communicate with their other instances.
 
