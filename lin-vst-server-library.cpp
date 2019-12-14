@@ -2624,7 +2624,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx, int c
     }    
       
     sched_yield();    
-    usleep(1000); 	   
+    usleep(40000); 	   
       
 #ifdef VST32SERVER
     if(val5 == 645)
