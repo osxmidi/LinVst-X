@@ -2372,8 +2372,21 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx, int c
     val5 = *sptr;		
      
  //   while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-    for (int loopidx = 0; (loopidx < 10) && PeekMessage(&msg, 0, 0, 0, PM_REMOVE); loopidx++)
-    {		  
+ //   for (int loopidx = 0; (loopidx < 10) && PeekMessage(&msg, 0, 0, 0, PM_REMOVE); loopidx++)
+ //   {	
+// Raymond Chen
+DWORD dwTimeout = 100;
+DWORD dwStart = GetTickCount();
+DWORD dwElapsed;
+
+    while ((dwElapsed = GetTickCount() - dwStart) < dwTimeout) 
+    {
+    DWORD dwStatus = MsgWaitForMultipleObjectsEx(0, NULL, dwTimeout - dwElapsed, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+
+    if (dwStatus == WAIT_OBJECT_0)   
+    {	
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
+    {  	    
     switch (msg.message)
     {	
     case WM_SYNC:
@@ -2643,9 +2656,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx, int c
     TranslateMessage(&msg);
     DispatchMessage(&msg);
     }    
+    }
+    }
       
     sched_yield();    
-    usleep(1000); 	   
+ //   usleep(1000); 	   
       
 #ifdef VST32SERVER
     if(val5 == 645)
