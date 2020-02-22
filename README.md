@@ -173,6 +173,8 @@ Symlinks can point to renamed linvstx.so files located within a WINEPREFIX.
 
 ## Common Problems/Possible Fixes
 
+Automatic window resizing is not supported, after a resize the UI needs to be closed and then reopened for the new window size to take effect.
+
 If a LinVst version error pops up then LinVst probably needs to be reinstalled to /usr/bin and the older (renamed) linvst.so files in the vst dll folder need to be overwritten (using linvstconvert or linvstconvertree).
 
 LinVst looks for wine in /usr/bin and if there isn't a /usr/bin/wine then that will probably cause problems.
