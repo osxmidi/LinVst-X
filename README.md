@@ -173,7 +173,9 @@ Symlinks can point to renamed linvstx.so files located within a WINEPREFIX.
 
 ## Common Problems/Possible Fixes
 
-LinVst-X looks for wine in /usr/bin and if there isn't a /usr/bin/wine then that will probably cause problems.
+If a LinVst version error pops up then LinVst probably needs to be reinstalled to /usr/bin and the older (renamed) linvst.so files in the vst dll folder need to be overwritten (using linvstconvert or linvstconvertree).
+
+LinVst looks for wine in /usr/bin and if there isn't a /usr/bin/wine then that will probably cause problems.
 /usr/bin/wine can be a symbolic link to /opt/wine-staging/bin/wine (for wine staging) for example.
 
 Quite a few plugins need winetricks corefonts installed for fonts.
@@ -191,6 +193,8 @@ Use TestVst for testing how a vst plugin might run under Wine.
 Some vst plugins rely on the d2d1 dll which is not totally implemented in current Wine.
 
 If a plugin has trouble with it's display then disabling d2d1 in the winecfg Libraries tab can be tried.
+
+Some plugins need Windows fonts (~/.wine/drive_c/windows/Fonts) ./winetricks corefonts
 
 Setting HKEY_CURRENT_USER Software Wine Direct3D MaxVersionGL to 30002 (MaxVersionGL is a DWORD hex value) might help with some plugins and d2d1 (can also depend on hardware and drivers).
 
@@ -217,15 +221,26 @@ Winetricks also has a force flag --force ie winetricks --force vcrun2013
 
 cabextract needs to be installed (sudo apt-get install cabextract, yum install cabextract etc)
 
+For details about overriding dll's, see the Wine Config section in the Detailed Guide https://github.com/osxmidi/LinVst/tree/master/Detailed-Guide
+
 To enable 32 bit vst's on a 64 bit system, a distro's multilib needs to be installed (on Ubuntu it would be sudo apt-get install gcc-multilib g++-multilib)
 
-For details about overriding dll's, see the next section (Wine Config).
+Drag and Drop is enabled for the embedded LinVst version used with Reaper/Tracktion/Waveforn/Bitwig but it's only for items dragged and dropped onto the vst window and not for items dragged and dropped from the vst window to the DAW/host or to the Desktop window.
+Usually the dragged item (dragged outside of the vst's window) will be saved as a midi or wav file in a location that is most likely to be located in one of the vst's folders ie a folder in My Documents or a folder that the vst installation has created. The midi or wav file can then be dragged to the DAW.
+See MT-PowerDrumKit and EZDrummer2 and Addictive Drums 2 and SSD5 in the Tested VST's folder at https://github.com/osxmidi/LinVst/tree/master/Tested-VST-Plugins for some details.
 
-Drag and Drop is enabled for the embedded LinVst-X version used with Reaper/Tracktion/Waveforn/Bitwig but it's only for items dragged and dropped into the vst window and not for items dragged and dropped from the vst window to the DAW/host window.
+Also, see the Tested VST's folder at https://github.com/osxmidi/LinVst/tree/master/Tested-VST-Plugins for some vst plugin setups and possible tips.
+
+**Bitwig**
+
+For Bitwig 2.5 and 3.0, In Settings->Plug-ins choose "Individually" plugin setting and check all of the LinVst plugins.
+For Bitwig 2.4.3, In Settings->Plug-ins choose Independent plug-in host process for "Each plug-in" setting and check all of the LinVst plugins.
 
 **Renoise**
 
-Sometimes a synth vst doesn't declare itself as a synth and Renoise might not enable it.
+Choose the sandbox option for plugins.
+
+Sometimes a synth vst might not declare itself as a synth and Renoise might not enable it.
 
 A workaround is to install sqlitebrowser
 
@@ -238,66 +253,4 @@ Add the synth vst's path to VST_PATH and start Renoise to scan it.
 Then exit renoise and edit the database file /home/user/.renoise/V3.1.0/ CachedVSTs_x64.db (enable hidden folders with right click in the file browser).
 
 Go to the "Browse Data" tab in SQLite browser and choose the CachedPlugins table and then locate the entry for the synth vst and enable the "IsSynth" flag from "0" (false) to "1" (true) and save.
-
-## Wine Config
-
-LinVst-X expects wine to be found in /usr/bin.
-
-Setting WINELOADER etc to a new wine path might possibly be used for different wine paths.
-
-Keyboard input etc can be enabled for the standalone window LinVst-X version only, by creating a UseTakeFocus string and setting it to a value of N, in HKEY_CURRENT_USER/Software/Wine/X11 Driver (regedit).
-
-More keyboard control (not recommended) can be enabled for the standalone window LinVst-X version only, by unchecking the winecfg option "Allow the window manager to control the windows".
-
-Keyboard input should be ok for the embedded window version.
-
-The embedded window version needs to be run with the winecfg option "Allow the window manager to control the windows" checked (which is usually the default).
-
-Sometimes usernames and passwords might need to be copied and pasted into the window because manual entry might not work in all cases.
-
-Sometimes a windows vst needs a Wine dll override.
-
-Finding out what dll's to possibly override can be done by running "strings vstname.dll | grep -i dll", which will display a list of dll's from the plugins dll file.
-
-For instance, if the dll list contains d2d1.dll and there are problems running the plugin, then d2d1 might possibly be a candidate to override or disable.
-
-If the Wine debugger displays "unimplemented function in XXXX.dll" somewhere in it's output, then that dll usually needs to be overriden with a windows dll.
-
-Overriding a dll involves copying the windows dll to a wine windows directory and then running winecfg to configure wine to override the dll.
-
-64 bit .dlls are copied to /home/username/.wine/drive_c/windows/system32 
-
-32 bit .dlls are copied to /home/username/.wine/drive_c/windows/syswow64
-
-Run winecfg and select the Libraries tab and then select the dll to override from the list or type the name.
-
-After adding the dll, check with the edit option that the dll's settings are native first and then builtin.
-
-https://www.winehq.org/docs/wineusr-guide/config-wine-main
-
-Sometimes required dll's might be missing and additional windows redistributable packages might need to be installed.
-
-Some windows vst's use D3D, and Wine uses Linux OpenGL to implement D3D, so a capable Linux OpenGL driver/setup might be required for some windows vst's.
-
-Disabling d2d1 in the Libraries section of winecfg might help with some windows vst's.
-
-Some D3D dll overrides might be needed for some windows vst's.
-
-D3D/OpenGL Wine config advice can be found at gaming forums and other forums.
-
-Additional dll's (dll overrides) might have to be added to Wine for some Windows vst's to work.
-
-Winetricks might help with some plugins https://github.com/Winetricks/winetricks
-
-Some plugins might use wininet for internet connections (online registration, online help, etc) which might cause problems depending on Wines current implementation.
-
-Running winetricks wininet and/or installing winbind and libntlm0 for a distro (sudo apt-get install winbind, sudo apt-get install libntlm0) might help (wininet and it's associated dll's can also be manually installed as dll overrides).
-
-Turning off the vst's multiprocessor support and/or GPU acceleration might help in some cases, due to what features Wine currently supports (Wine version dependent).
-
-On some slower systems Wine can initially take a long time to load properly when Wine is first used, which might cause a LinVst-X crash.
-The solution is to initialise Wine first by running winecfg or any other Wine based program, so that Wine has been initialised before LinVst-X is used.
-
-Upgrading to the latest wine version is recommended.
-
 
