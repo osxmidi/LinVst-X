@@ -10,8 +10,6 @@ Plugins running in one process are not sandboxed, so if one plugin crashes then 
 
 It's best to use plugins that already run with LinVst and/or use TestVst to test how a plugin might run under Wine.
 
-Bitwig seems to require that LinVst Wine wrapped plugins run in a sandbox (Individually), which nullifies the purpose of LinVst-X which is to run plugins in one process (not sandboxed), so Bitwig is probably not going to be a great match with LinVst-X.
-
 LinVst-X usage is basically the same as LinVst except that the file to be renamed to the vst dll name is linvstx.so (rather than linvst.so for LinVst).
 
 The LinVst-X server can be preloaded
@@ -234,11 +232,6 @@ Usually the dragged item (dragged outside of the vst's window) will be saved as 
 See MT-PowerDrumKit and EZDrummer2 and Addictive Drums 2 and SSD5 in the Tested VST's folder at https://github.com/osxmidi/LinVst/tree/master/Tested-VST-Plugins for some details.
 
 Also, see the Tested VST's folder at https://github.com/osxmidi/LinVst/tree/master/Tested-VST-Plugins for some vst plugin setups and possible tips.
-
-**Bitwig**
-
-For Bitwig 2.5 and 3.0, In Settings->Plug-ins choose "Individually" plugin setting and check all of the LinVst plugins.
-For Bitwig 2.4.3, In Settings->Plug-ins choose Independent plug-in host process for "Each plug-in" setting and check all of the LinVst plugins.
 
 **Renoise**
 
