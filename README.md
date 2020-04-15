@@ -8,6 +8,8 @@ It means that plugin instances can communicate with each other (which is not pos
 
 Plugins running in one process are not sandboxed, so if one plugin crashes then the whole lot might crash.
 
+LinVst-X is not recommended for use with Bitwig.
+
 It's best to use plugins that already run with LinVst and/or use TestVst to test how a plugin might run under Wine.
 
 LinVst-X usage is basically the same as LinVst except that the file to be renamed to the vst dll name is linvstx.so (rather than linvst.so for LinVst).
