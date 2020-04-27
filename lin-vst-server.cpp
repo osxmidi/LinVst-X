@@ -290,6 +290,7 @@ VstIntPtr rv = 0;
     int handle;
     int width;
     int height;
+    int winerror;
     } winm2;    
     winmessage *winm;
 #endif
@@ -1175,6 +1176,8 @@ bool RemoteVSTServer::warn(std::string warning)
 void RemoteVSTServer::showGUI()
 {
 DWORD dwWaitResult;	
+	
+        winm->winerror = 0;
 
     if ((haveGui == false) || (guiVisible == true))
     {
