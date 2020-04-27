@@ -1245,7 +1245,7 @@ Atom xembedatom;
        rp->right = plugin->width;
        rp->left = 0;
 	    
-       if(!plugin->winm->winerror)
+       if(plugin->winm->winerror)
        {
        plugin->displayerr = 1;
        plugin->eventrun = 0;
@@ -2160,7 +2160,7 @@ ptr = (int *)m_shm;
     for (int i=0;i<4000;i++)
     {
         usleep(10000);
-        if (*ptr == 244)
+        if (*ptr == 245)
          {
             startok = 1;
             break;
