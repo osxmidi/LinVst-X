@@ -2451,6 +2451,7 @@ DWORD dwElapsed;
     if (!remoteVSTServerInstance2[pidx]->rect)
     {
     printf("RectErr\n"); 
+    remoteVSTServerInstance2[pidx]->winm->winerror = 1; 
     sched_yield();	     
     SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent);    
     break;     
