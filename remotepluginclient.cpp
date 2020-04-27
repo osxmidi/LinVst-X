@@ -1082,6 +1082,7 @@ Atom xembedatom;
     {
         rp = &plugin->retRect;
         *((struct ERect **)ptr) = rp;
+        v=plugin->winrect;	    
     }
         break;
 
@@ -1242,10 +1243,17 @@ Atom xembedatom;
        rp->top = 0;
        rp->right = plugin->width;
        rp->left = 0;
+	    
+       if(!plugin->winm->winerror)
+       {
+       plugin->displayerr = 1;
+       plugin->eventrun = 0;
+       break;	       
+       }
        
        if(!plugin->handle)
        {
-	   plugin->displayerr = 1;
+       plugin->displayerr = 1;
        plugin->eventrun = 0;
        break;
        }
@@ -1254,11 +1262,12 @@ Atom xembedatom;
 
        if(!plugin->display)
        {
-	   plugin->displayerr = 1;
+       plugin->displayerr = 1;
        plugin->eventrun = 0;
        break;
-       }
-     
+       }	    
+	    
+       plugin->winrect = 1;
        plugin->eventrun = 1;  
             
 #ifdef XECLOSE
