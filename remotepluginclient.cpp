@@ -1103,6 +1103,9 @@ Atom xembedatom;
 #endif
         rp = &plugin->retRect;
         *((struct ERect **)ptr) = rp;
+	if(plugin->winrect == 2)
+	v = 0;  
+	else
 	v=plugin->winrect;		    
     }
         break;
@@ -1269,6 +1272,7 @@ Atom xembedatom;
        {
        plugin->displayerr = 1;
        plugin->eventrun = 0;
+       plugin->winrect = 2;	       
        break;	       
        }
        
