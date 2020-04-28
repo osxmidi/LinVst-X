@@ -1081,9 +1081,29 @@ Atom xembedatom;
     {
     case effEditGetRect:
     {
+#ifdef EMBED
+        if(plugin->winrect == 0)
+        {
+        plugin->effVoidOp(effEditGetRect);
+
+        if(!plugin->winm->winerror)
+        {
+        plugin->width = plugin->winm->width;
+        plugin->height = plugin->winm->height;
+
+        rp = &plugin->retRect;
+        rp->bottom = plugin->height;
+        rp->top = 0;
+        rp->right = plugin->width;
+        rp->left = 0;
+
+	plugin->winrect = 1;	
+        }
+        }
+#endif
         rp = &plugin->retRect;
         *((struct ERect **)ptr) = rp;
-        v=plugin->winrect;	    
+	v=plugin->winrect;		    
     }
         break;
 
@@ -1401,7 +1421,10 @@ Atom xembedatom;
 #else            
         plugin->hideGUI();
 #endif  
-	editopen = 0;	 
+	editopen = 0;	
+#ifdef EMBED
+        plugin->winrect = 0;	
+#endif 		        		    
 	v=1;		    
         break;
 
@@ -3334,12 +3357,12 @@ bool RemotePluginClient::warn(std::string str)
 
 void RemotePluginClient::showGUI()
 {  
-    winrect = 0;	
     writeOpcodering(&m_shmControl3->ringBuffer, RemotePluginShowGUI);
     commitWrite(&m_shmControl3->ringBuffer);
     waitForServer3();  
 
 #ifdef EMBED
+    winrect = 0;	
     tryRead(&m_shm[FIXED_SHM_SIZE], winm, sizeof(winmessage));
 #endif
 }
