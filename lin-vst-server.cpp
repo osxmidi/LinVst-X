@@ -769,10 +769,15 @@ DWORD dwWaitResult;
     CloseHandle(ghWriteEvent5);
 	sched_yield();		
      
+    waitForServerexit();	
+     
     waitForClient2exit();
     waitForClient3exit();
     waitForClient4exit();
     waitForClient5exit();
+
+	sched_yield();	
+
 
 /*
 #ifdef EMBED		
@@ -2237,10 +2242,14 @@ DWORD dwWaitResult;
       sched_yield();
 
    //   remoteVSTServerInstance2[idx]->waitForServerexit();
+   
+   /*
       remoteVSTServerInstance2[idx]->waitForClient2exit();
       remoteVSTServerInstance2[idx]->waitForClient3exit();
       remoteVSTServerInstance2[idx]->waitForClient4exit();
-      remoteVSTServerInstance2[idx]->waitForClient5exit();	
+      remoteVSTServerInstance2[idx]->waitForClient5exit();
+      
+      */
 	
   //    WaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000);
       MsgWaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000, QS_ALLEVENTS);
