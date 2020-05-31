@@ -2241,18 +2241,15 @@ DWORD dwWaitResult;
 
       sched_yield();
 
-   //   remoteVSTServerInstance2[idx]->waitForServerexit();
-   
-   /*
+      remoteVSTServerInstance2[idx]->waitForServerexit();
       remoteVSTServerInstance2[idx]->waitForClient2exit();
       remoteVSTServerInstance2[idx]->waitForClient3exit();
       remoteVSTServerInstance2[idx]->waitForClient4exit();
       remoteVSTServerInstance2[idx]->waitForClient5exit();
       
-      */
 	
-  //    WaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000);
-      MsgWaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000, QS_ALLEVENTS);
+      WaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000);
+  //    MsgWaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000, QS_ALLEVENTS);
 
       if (remoteVSTServerInstance2[idx]->ThreadHandle[0])
       CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[0]);
