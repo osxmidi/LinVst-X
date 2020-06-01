@@ -30,6 +30,23 @@ See the convert folder Notes on how to make the linvstx.so renaming conversion u
 
 The server can be killed when no plugins are loaded.
 
+To kill the server (when no plugins are loaded) get the pid(s) of lin-vst-server
+
+pgrep lin-vst
+
+or
+
+ps -ef | grep lin-vst
+
+and then use the pid(s) to kill the lin-vst-server
+
+kill -15 pid
+
+or
+
+kill -9 pid
+
+
 ## Quick Start Guide
 
 (See the Wiki page for a visual guide https://github.com/osxmidi/LinVst/wiki)
