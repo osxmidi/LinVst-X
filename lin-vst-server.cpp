@@ -2246,10 +2246,16 @@ DWORD dwWaitResult;
       remoteVSTServerInstance2[idx]->waitForClient3exit();
       remoteVSTServerInstance2[idx]->waitForClient4exit();
       remoteVSTServerInstance2[idx]->waitForClient5exit();
-      
-	
-      WaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000);
-  //    MsgWaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000, QS_ALLEVENTS);
+      	
+   //   WaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000);
+      MsgWaitForMultipleObjects(3, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000, QS_ALLEVENTS);
+  
+      for (int idx50=0;idx50<100000;idx50++)
+      {
+      if (remoteVSTServerInstance2[idx]->parfin && remoteVSTServerInstance2[idx]->audfin && remoteVSTServerInstance2[idx]->getfin)
+      break;
+      usleep(100);    
+      }
 
       if (remoteVSTServerInstance2[idx]->ThreadHandle[0])
       CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[0]);
