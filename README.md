@@ -28,7 +28,13 @@ sudo make install
 
 See the convert folder Notes on how to make the linvstx.so renaming conversion utilities.
 
-The server can be killed when no plugins are loaded.
+The LinVst-X server can be preloaded
+
+wine /usr/bin/lin-vst-server-x.exe.so for 64 bit plugins
+
+wine /usr/bin/lin-vst-server-x32.exe.so for 32 bit plugins
+
+The LinVst-X server can be killed
 
 To kill the server (when no plugins are loaded) get the pid(s) of lin-vst-server
 
@@ -45,6 +51,7 @@ kill -15 pid
 or
 
 kill -9 pid
+
 
 
 ## Quick Start Guide
