@@ -26,7 +26,7 @@ See the convert folder Notes on how to make the linvstx.so renaming conversion u
 
 LinVst-X server details.
 
-The LinVst-X server is first started (after a boot) when a plugin is first loaded and after that the LinVst server continues to run and further plugin loading can occur faster than with LinVst.
+The LinVst-X server is first started (after a boot) when a plugin is first loaded and after that the LinVst-X server continues to run and further plugin loading can occur faster than with LinVst.
 
 The LinVst-X server can be killed
 
