@@ -50,12 +50,6 @@ and then use the pid(s) to kill the lin-vst-server
 
 kill -15 pid
 
-or
-
-kill -9 pid
-
-
-
 ## Quick Start Guide
 
 (See the Wiki page for a visual guide https://github.com/osxmidi/LinVst/wiki)
