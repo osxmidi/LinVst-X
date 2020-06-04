@@ -14,12 +14,6 @@ LinVst-X might have some problems running with Bitwig and Tracktion/Waveform due
 
 LinVst-X usage is basically the same as LinVst except that the file to be renamed to the vst dll name is linvstx.so (rather than linvst.so for LinVst).
 
-The LinVst-X server can be preloaded
-
-wine /usr/bin/lin-vst-server-x.exe.so for 64 bit plugins
-
-wine /usr/bin/lin-vst-server-x32.exe.so for 32 bit plugins
-
 LinVst-X binaries are at https://github.com/osxmidi/LinVst-X/releases
 
 The usual X11 and Wine dev packages and multilib are needed (details are in the LinVst Make Guide https://github.com/osxmidi/LinVst/tree/master/Make-Guide) then
@@ -30,15 +24,13 @@ sudo make install
 
 See the convert folder Notes on how to make the linvstx.so renaming conversion utilities.
 
-The LinVst-X server can be preloaded
+LinVst-X server details.
 
-wine /usr/bin/lin-vst-server-x.exe.so for 64 bit plugins
-
-wine /usr/bin/lin-vst-server-x32.exe.so for 32 bit plugins
+The LinVst-X server is first started (after a boot) when a plugin is first loaded and after that the LinVst server continues to run and further plugin loading can occur faster than with LinVst.
 
 The LinVst-X server can be killed
 
-To kill the server (when no plugins are loaded) get the pid(s) of lin-vst-server
+To kill the server (when no plugins are loaded) get the pid of the lin-vst-server
 
 pgrep lin-vst
 
@@ -46,7 +38,7 @@ or
 
 ps -ef | grep lin-vst
 
-and then use the pid(s) to kill the lin-vst-server
+and then use the pid to kill the lin-vst-server
 
 kill -15 pid
 
