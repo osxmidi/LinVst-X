@@ -28,7 +28,7 @@ LinVst-X server details.
 
 The LinVst-X server is first started (after a boot) when a plugin is first loaded and after that the LinVst-X server continues to run and further plugin loading can occur faster than with LinVst.
 
-The LinVst-X server can be killed
+The LinVst-X server can be killed when no plugins are currently loaded.
 
 To kill the server (when no plugins are loaded) get the pid of the lin-vst-server
 
