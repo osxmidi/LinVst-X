@@ -1854,6 +1854,18 @@ void RemotePluginClient::ServerConnect(Dl_info info)
     {
     doexec = 1;
     }
+	
+    #ifdef LVRT
+    struct sched_param param;
+    param.sched_priority = 1;
+
+    int result = sched_setscheduler(0, SCHED_FIFO, &param);
+
+    if (result < 0)
+    {
+        perror("Failed to set realtime priority");
+    }
+    #endif    	
     
 //    signal(SIGCHLD, SIG_IGN);
 
@@ -1932,19 +1944,7 @@ for(int fd=3; fd<maxfd; fd++)
 #endif  
     }    
     }
-        
-    #ifdef LVRT
-    struct sched_param param;
-    param.sched_priority = 1;
-
-    int result = sched_setscheduler(0, SCHED_FIFO, &param);
-
-    if (result < 0)
-    {
-        perror("Failed to set realtime priority");
-    }
-    #endif
-      
+              
     if(doexec)
     {
     for(int i9=0;i9<20000;i9++)
