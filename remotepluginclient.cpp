@@ -488,7 +488,6 @@ RemotePluginClient::RemotePluginClient(audioMasterCallback theMaster, Dl_info   
     m_threadinit(0),
     m_threadbreak(0),
     m_threadbreakexit(0),
-    winrect(0),
     m_shmFileName(0),
     m_shm(0),
     m_shmSize(0),
@@ -1250,8 +1249,7 @@ Atom xembedatom;
        if(plugin->winm->winerror)
        {
        plugin->displayerr = 1;
-       plugin->eventrun = 0;
-       plugin->winrect = 2;	       
+       plugin->eventrun = 0;	       
        break;	       
        }
        
@@ -1271,7 +1269,6 @@ Atom xembedatom;
        break;
        }	    
 	    
-       plugin->winrect = 1;
        plugin->eventrun = 1;  
             
 #ifdef XECLOSE
@@ -1405,9 +1402,7 @@ Atom xembedatom;
         plugin->hideGUI();
 #endif  
 	editopen = 0;	
-#ifdef EMBED
-        plugin->winrect = 0;	
-#endif 		        		    
+		    
 	v=1;		    
         break;
 
@@ -3344,8 +3339,7 @@ void RemotePluginClient::showGUI()
     commitWrite(&m_shmControl3->ringBuffer);
     waitForServer3();  
 
-#ifdef EMBED
-    winrect = 0;	
+#ifdef EMBED	
     tryRead(&m_shm[FIXED_SHM_SIZE], winm, sizeof(winmessage));
 #endif
 }
