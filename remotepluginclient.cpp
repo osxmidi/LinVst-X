@@ -246,7 +246,7 @@ else
                    retstr2[0]='\0';
                    strcpy(retstr2, &m_shm[FIXED_SHM_SIZE3]);
                    retval = m_audioMaster(theEffect, audioMasterCanDo, 0, 0, (char *) retstr2, 0);
-                   memcpy(&m_shm3[FIXED_SHM_SIZE3], &retval, sizeof(int));
+                   memcpy(&m_shm3[FIXED_SHM_SIZE3 + 512], &retval, sizeof(int));
                    break;  
 #endif				
                    case audioMasterGetVendorString:
