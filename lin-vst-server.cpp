@@ -1710,7 +1710,7 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode, VstIn
     writeIntring(&m_shmControl->ringBuffer, value);
     commitWrite(&m_shmControl->ringBuffer);
     waitForServer();
-    guiupdate = 1;
+//    guiupdate = 1;
     rv = 1;
     }
 #endif
