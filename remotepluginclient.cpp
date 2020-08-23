@@ -1080,36 +1080,15 @@ Atom xembedatom;
     switch (opcode)
     {
     case effEditGetRect:
-    {
-#ifdef EMBED
-        if(plugin->winrect == 0)
-        {
-        plugin->effVoidOp(effEditGetRect);
-
-        if(!plugin->winm->winerror)
-        {
-        plugin->width = plugin->winm->width;
-        plugin->height = plugin->winm->height;
-
-        rp = &plugin->retRect;
-        rp->bottom = plugin->height;
-        rp->top = 0;
-        rp->right = plugin->width;
-        rp->left = 0;
-
-	plugin->winrect = 1;	
-        }
-        }
-#endif
-        rp = &plugin->retRect;
-        *((struct ERect **)ptr) = rp;
-	if(plugin->winrect == 2)
-	v = 0;  
-	else
-	v=plugin->winrect;		    
-    }
-        break;
-
+       rp = &plugin->retRect;
+       *((struct ERect **)ptr) = rp;
+        
+       if(editopen == 1)
+       v = 1;
+       else
+       v = 0;
+       break;
+		    
     case effEditIdle:
 #ifdef EMBED
 #ifdef XEMBED
