@@ -279,12 +279,18 @@ else
                     height = retRect.bottom;
                     if(display && parent && child)
                     {
+		    if(reaperid == 0)
+		    retval = m_audioMaster(theEffect, audioMasterSizeWindow, width, height, 0, 0);                   							
                     XUnmapWindow(display, child);
-                    XResizeWindow(display, parent, width, height);
+                  //  XResizeWindow(display, parent, width, height);
                     XResizeWindow(display, child, width, height);
+                    XEvent e;
+                    if(XCheckTypedWindowEvent(display, child, ConfigureNotify, &e))
+                    {        
                     XMapWindow(display, child);
                     XSync(display, false);
                     XFlush(display);
+		    }
                     }
                     break;
 #endif
