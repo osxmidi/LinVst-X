@@ -276,8 +276,7 @@ static float getparproc(AEffect* effect, int index);
         int height;
         int winerror;        
      } winm2;
-   winmessage *winm;
-  int winrect;    
+   winmessage *winm;   
   int displayerr;
 #ifdef EMBEDTHREAD
    pthread_t           m_EMBEDThread;
