@@ -1916,11 +1916,11 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode, VstIn
     if(!exiting)
     {	
     writeOpcodering(&m_shmControl->ringBuffer, (RemotePluginOpcode)opcode);
-    strcpy(&m_shm[FIXED_SHM_SIZE3], (char*)ptr);
+    strcpy(&remoteVSTServerInstance->m_shm3[FIXED_SHM_SIZE3], (char*)ptr);
     commitWrite(&m_shmControl->ringBuffer);
     waitForServer();
 
-    memcpy(&retval, &m_shm3[FIXED_SHM_SIZE3], sizeof(int));
+    memcpy(&retval, &remoteVSTServerInstance->m_shm3[FIXED_SHM_SIZE3 + 512], sizeof(int));
     rv = retval;  
     }
     }
