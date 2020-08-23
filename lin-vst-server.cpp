@@ -1693,7 +1693,6 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode, VstIn
     case audioMasterSizeWindow:
 {
 #ifdef EMBED
-#ifndef TRACKTIONWM
 #ifdef EMBEDRESIZE
    int opcodegui = 123456789;
 	
@@ -1705,6 +1704,11 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode, VstIn
     // ShowWindow(hWnd, SW_HIDE);
     // SetWindowPos(hWnd, HWND_TOP, 0, 0, guiresizewidth, guiresizeheight, 0);
 	    
+#ifdef TRACKTIONWM
+    if(remoteVSTServerInstance->hosttracktion == 1)
+    SetWindowPos(remoteVSTServerInstance->hWnd, HWND_TOP, GetSystemMetrics(SM_XVIRTUALSCREEN) + remoteVSTServerInstance->offset.x, GetSystemMetrics(SM_YVIRTUALSCREEN) + remoteVSTServerInstance->offset.y, index, value, 0); 
+#endif	    
+	    
     writeOpcodering(&m_shmControl->ringBuffer, (RemotePluginOpcode)opcodegui);
     writeIntring(&m_shmControl->ringBuffer, index);
     writeIntring(&m_shmControl->ringBuffer, value);
@@ -1713,7 +1717,6 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode, VstIn
 //    guiupdate = 1;
     rv = 1;
     }
-#endif
 #endif
 #else	
      if (hWnd && !exiting && effectrun && guiVisible)
