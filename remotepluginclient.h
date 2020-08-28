@@ -316,9 +316,11 @@ char a[96];
 
 VstTimeInfo *timeInfo;  
 
+#ifdef EMBED    
 #ifdef TRACKTIONWM  
 int waveformid;
 int hosttracktion;
+#endif 
 #endif     
     
 #ifdef WAVES
