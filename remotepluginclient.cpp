@@ -545,6 +545,10 @@ RemotePluginClient::RemotePluginClient(audioMasterCallback theMaster, Dl_info   
     height(0),
     displayerr(0),
     winm(0),
+#ifdef TRACKTIONWM     
+    waveformid(0),
+    hosttracktion(0),
+#endif        
 #ifndef XEMBED
 #ifdef EMBEDDRAG
     x11_win(0),
@@ -940,7 +944,14 @@ Atom xembedatom = XInternAtom(display, "_XEMBED_INFO", False);
       e.xconfigure.event = child;
       e.xconfigure.window = child;
       e.xconfigure.x = x;
+#ifdef TRACKTIONWM  
+      if(waveformid > 0)     
+      e.xconfigure.y = y + waveformid;
+      else
       e.xconfigure.y = y;
+#else
+      e.xconfigure.y = y;
+#endif      
       e.xconfigure.width = width;
       e.xconfigure.height = height;
       e.xconfigure.border_width = 0;
@@ -1426,7 +1437,10 @@ Atom xembedatom;
         {
         plugin->m_audioMaster(plugin->theEffect, audioMasterGetProductString, 0, 0, dawbuf, 0);
         if((strcmp(dawbuf, "Tracktion") == 0) || (strcmp(dawbuf, "Waveform") == 0))
-        plugin->effVoidOp(67584930);
+        {
+		plugin->hosttracktion = 1;
+        plugin->waveformid = plugin->effVoidOp2(67584930, index, value, opt);
+	    }
         }
         }
 #endif
@@ -2167,7 +2181,7 @@ ptr = (int *)m_shm;
     for (int i=0;i<4000;i++)
     {
         usleep(10000);
-        if (*ptr == 245)
+        if (*ptr == 300)
          {
             startok = 1;
             break;
@@ -2574,29 +2588,42 @@ std::string RemotePluginClient::getEffString(int opcode, int index)
 
 std::string RemotePluginClient::getParameterName(int p)
 {
-    writeOpcodering(&m_shmControl3->ringBuffer, RemotePluginGetParameterName);
-    writeIntring(&m_shmControl3->ringBuffer, p);
-    commitWrite(&m_shmControl3->ringBuffer);
-    waitForServer3();  
+    writeOpcodering(&m_shmControl5->ringBuffer, RemotePluginGetParameterName);
+    writeIntring(&m_shmControl5->ringBuffer, p);
+    commitWrite(&m_shmControl5->ringBuffer);
+    waitForServer5();  
     return &m_shm[FIXED_SHM_SIZE];
 }
 
 std::string RemotePluginClient::getParameterLabel(int p)
 {
-    writeOpcodering(&m_shmControl3->ringBuffer, RemotePluginGetParameterLabel);
-    writeIntring(&m_shmControl3->ringBuffer, p);
-    commitWrite(&m_shmControl3->ringBuffer);
-    waitForServer3();  
+    writeOpcodering(&m_shmControl5->ringBuffer, RemotePluginGetParameterLabel);
+    writeIntring(&m_shmControl5->ringBuffer, p);
+    commitWrite(&m_shmControl5->ringBuffer);
+    waitForServer5();  
     return &m_shm[FIXED_SHM_SIZE];
 }
 
 std::string RemotePluginClient::getParameterDisplay(int p)
 {
-    writeOpcodering(&m_shmControl3->ringBuffer, RemotePluginGetParameterDisplay);
-    writeIntring(&m_shmControl3->ringBuffer, p);
-    commitWrite(&m_shmControl3->ringBuffer);
-    waitForServer3();  
+    writeOpcodering(&m_shmControl5->ringBuffer, RemotePluginGetParameterDisplay);
+    writeIntring(&m_shmControl5->ringBuffer, p);
+    commitWrite(&m_shmControl5->ringBuffer);
+    waitForServer5();  
     return &m_shm[FIXED_SHM_SIZE];
+}
+
+int RemotePluginClient::getParameterCount()
+{
+    if (m_inexcept == 1 || m_finishaudio == 1)
+    {
+        return 0;
+    }
+
+    writeOpcodering(&m_shmControl5->ringBuffer, RemotePluginGetParameterCount);
+    commitWrite(&m_shmControl5->ringBuffer);
+    waitForServer5();  
+    return readInt(&m_shm[FIXED_SHM_SIZE]);
 }
 
 #ifdef WAVES
@@ -3552,19 +3579,6 @@ int RemotePluginClient::getOutputCount()
     m_numOutputs = readInt(&m_shm[FIXED_SHM_SIZE]);
 
     return m_numOutputs;
-}
-
-int RemotePluginClient::getParameterCount()
-{
-    if (m_inexcept == 1 || m_finishaudio == 1)
-    {
-        return 0;
-    }
-
-    writeOpcodering(&m_shmControl3->ringBuffer, RemotePluginGetParameterCount);
-    commitWrite(&m_shmControl3->ringBuffer);
-    waitForServer3();  
-    return readInt(&m_shm[FIXED_SHM_SIZE]);
 }
 
 int RemotePluginClient::getProgramCount()

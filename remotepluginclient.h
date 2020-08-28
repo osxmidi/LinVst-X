@@ -314,7 +314,12 @@ struct vinfo
 char a[96];
 };    
 
-VstTimeInfo *timeInfo;   
+VstTimeInfo *timeInfo;  
+
+#ifdef TRACKTIONWM  
+int waveformid;
+int hosttracktion;
+#endif     
     
 #ifdef WAVES
 int wavesthread;
