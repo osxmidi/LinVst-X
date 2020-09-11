@@ -142,26 +142,25 @@ public:
     int                 EffectOpen();
 
 #ifdef EMBED
-#ifdef XEMBED
-#ifndef EMBEDTHREAD    
-    void sendXembedMessage(Display* display, Window window, long message, long detail, long data1, long data2);
-    
-#endif
-#endif
-#endif
 
-#ifdef EMBED
+
 #ifndef XEMBED
 #ifdef EMBEDDRAG
-void eventloop(Display *display, Window pparent, Window parent, Window child, int width, int height, int eventrun2, int parentok, int reaperid);
+void eventloop(Display *display, Window pparent, Window parent, Window child, int width, int height, int eventrun2, int parentok, int reaperid, RemotePluginClient *plugin);
 #else
-void eventloop(Display *display, Window parent, Window child, int width, int height, int eventrun2, int parentok, int reaperid);
+void eventloop(Display *display, Window parent, Window child, int width, int height, int eventrun2, int reaperid, RemotePluginClient *plugin);
 #endif  
+#else
+#ifdef EMBEDDRAG
+void eventloopx(Display *display, Window parent, Window child, Window pparent, int eventrun2, int width, int height, int parentok, int reaperid, RemotePluginClient  *plugin);
+#else
+void eventloopx(Display *display, Window parent, Window child, int eventrun2, int width, int height, int reaperid, RemotePluginClient  *plugin);
+#endif
 #endif
 #endif
 
 #ifdef EMBED
-#ifdef XECLOSE
+#if defined(XECLOSE) || defined(XEMBED)
 void sendXembedMessage(Display* display, Window window, long message, long detail, long data1, long data2);
 #endif
 #endif
@@ -234,6 +233,7 @@ static float getparproc(AEffect* effect, int index);
 
     int                 m_threadbreak;
     int                 m_threadbreakexit;
+    int                 editopen;
 #ifdef EMBED
 #ifdef EMBEDTHREAD
     int                 m_threadbreakembed;
@@ -258,6 +258,7 @@ static float getparproc(AEffect* effect, int index);
     int                 m_updateio;
     int                 m_updatein;
     int                 m_updateout;
+    int                 m_delay;
 #ifdef CHUNKBUF
     char *chunk_ptr;
 #endif
@@ -278,6 +279,9 @@ static float getparproc(AEffect* effect, int index);
      } winm2;
    winmessage *winm;   
   int displayerr;
+#ifdef EMBEDRESIZE
+  int resizedone;
+#endif       
 #ifdef EMBEDTHREAD
    pthread_t           m_EMBEDThread;
    static void         *callEMBEDThread(void *arg) { return ((RemotePluginClient*)arg)->EMBEDThread(); }

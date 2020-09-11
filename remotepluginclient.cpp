@@ -140,26 +140,35 @@ else
                     break;
 
                 case audioMasterIOChanged:
-                    retval = 0;
+                
                     memcpy(&am, &m_shm3[FIXED_SHM_SIZE3], sizeof(am));
-                    theEffect->flags = am.flags;
-                    theEffect->numPrograms = am.pcount;
-                    theEffect->numParams = am.parcount;
-                    theEffect->numInputs = am.incount;
-                    theEffect->numOutputs = am.outcount;
-                    theEffect->initialDelay = am.delay;
-                    // m_updateio = 1;
-                    retval = m_audioMaster(theEffect, audioMasterIOChanged, 0, 0, 0, 0);
-                    memcpy(&m_shm3[FIXED_SHM_SIZE3], &retval, sizeof(int));
-                    if((am.incount != m_numInputs) || (am.outcount != m_numOutputs))
-                    {
+                     printf("client %d %d %d \n", am.incount, am.outcount, am.delay);
+                 //   if((am.incount != m_numInputs) || (am.outcount != m_numOutputs) || (am.delay != m_delay))
+                  //  {
+					if((am.incount != m_numInputs) || (am.outcount != m_numOutputs))
+					{	
                     if ((am.incount + am.outcount) * m_bufferSize * sizeof(float) < (PROCESSSIZE))
                     {
+						
+						printf("up\n");
+						
                     m_updateio = 1;
                     m_updatein = am.incount;
-                    m_updateout = am.outcount;
-                    }
-                    }
+                    m_updateout = am.outcount; 
+                    theEffect->numInputs = am.incount;
+                    theEffect->numOutputs = am.outcount;
+				    }
+				    }                                   
+                    if(am.delay != m_delay)
+                    {
+					m_delay = am.delay;	
+                    theEffect->initialDelay = am.delay;
+                    printf("del\n");
+				    }
+                    retval = 0;
+                    retval = m_audioMaster(theEffect, audioMasterIOChanged, 0, 0, 0, 0);
+                    memcpy(&m_shm3[FIXED_SHM_SIZE3], &retval, sizeof(int));
+				   // }
                     break;
 
                 case audioMasterProcessEvents:  
@@ -229,7 +238,7 @@ else
                    memcpy(&m_shm3[FIXED_SHM_SIZE3], &retval, sizeof(int));
                    break;
 				
-		   case audioMasterGetSampleRate:
+		           case audioMasterGetSampleRate:
                    retval = 0;
                    retval = m_audioMaster(theEffect, audioMasterGetSampleRate, 0, 0, 0, 0);
                    memcpy(&m_shm3[FIXED_SHM_SIZE3], &retval, sizeof(int));
@@ -275,22 +284,16 @@ else
                     retRect.bottom = readIntring(&m_shmControl->ringBuffer);
                     retRect.left = 0;
                     retRect.top = 0;
-		    width = retRect.right;
+	        	    width = retRect.right;
                     height = retRect.bottom;
                     if(display && parent && child)
                     {
-		    if(reaperid == 0)
-		    retval = m_audioMaster(theEffect, audioMasterSizeWindow, width, height, 0, 0);                   							
+	        	    if(reaperid == 0)
+	        	    retval = m_audioMaster(theEffect, audioMasterSizeWindow, width, height, 0, 0);                   							
                     XUnmapWindow(display, child);
                   //  XResizeWindow(display, parent, width, height);
+                    resizedone = 1;
                     XResizeWindow(display, child, width, height);
-                    XEvent e;
-                    if(XCheckTypedWindowEvent(display, child, ConfigureNotify, &e))
-                    {        
-                    XMapWindow(display, child);
-                    XSync(display, false);
-                    XFlush(display);
-		    }
                     }
                     break;
 #endif
@@ -351,35 +354,6 @@ else
     // pthread_exit(0);
     return 0;
 }
-
-#ifdef EMBED
-#ifdef XEMBED
-#ifndef EMBEDTHREAD 
-
-#define XEMBED_EMBEDDED_NOTIFY	0
-#define XEMBED_FOCUS_OUT 5
-
-void void RemotePluginClient::sendXembedMessage(Display* display, Window window, long message, long detail, long data1, long data2)
-{
-	XEvent event;
-
-	memset(&event, 0, sizeof(event));
-	event.xclient.type = ClientMessage;
-	event.xclient.window = window;
-	event.xclient.message_type = XInternAtom(display, "_XEMBED", false);
-	event.xclient.format = 32;
-	event.xclient.data.l[0] = CurrentTime;
-	event.xclient.data.l[1] = message;
-	event.xclient.data.l[2] = detail;
-	event.xclient.data.l[3] = data1;
-	event.xclient.data.l[4] = data2;
-
-	XSendEvent(display, window, false, NoEventMask, &event);
-	XSync(display, false);
-}
-#endif
-#endif
-#endif
 
 #ifdef EMBED
 #ifdef EMBEDTHREAD
@@ -448,7 +422,7 @@ return 0;
 #endif
 
 #ifdef EMBED
-#ifdef XECLOSE
+#if defined(XECLOSE) || defined(XEMBED)
 #define XEMBED_EMBEDDED_NOTIFY	0
 #define XEMBED_FOCUS_OUT 5
 
@@ -494,6 +468,7 @@ RemotePluginClient::RemotePluginClient(audioMasterCallback theMaster, Dl_info   
     m_threadinit(0),
     m_threadbreak(0),
     m_threadbreakexit(0),
+    editopen(0),
     m_shmFileName(0),
     m_shm(0),
     m_shmSize(0),
@@ -524,6 +499,7 @@ RemotePluginClient::RemotePluginClient(audioMasterCallback theMaster, Dl_info   
     m_updateio(0),
     m_updatein(0),
     m_updateout(0),
+    m_delay(0),
 #ifdef CHUNKBUF
     chunk_ptr(0),
 #endif
@@ -545,6 +521,9 @@ RemotePluginClient::RemotePluginClient(audioMasterCallback theMaster, Dl_info   
     height(0),
     displayerr(0),
     winm(0),
+#ifdef EMBEDRESIZE
+    resizedone(0),
+#endif             
 #ifdef TRACKTIONWM     
     waveformid(0),
     hosttracktion(0),
@@ -813,12 +792,188 @@ RemotePluginClient::~RemotePluginClient()
  //    wait(NULL);
 }
 
+
+#ifdef EMBED
+#ifdef XEMBED
+#ifdef EMBEDDRAG
+void RemotePluginClient::eventloopx(Display *display, Window parent, Window child, Window pparent, int eventrun2, int width, int height, int parentok, int reaperid, RemotePluginClient  *plugin)
+#else
+void RemotePluginClient::eventloopx(Display *display, Window parent, Window child, int eventrun2, int width, int height, int reaperid, RemotePluginClient  *plugin)
+#endif
+{
+   if(!display)
+   return;	
+	
+#ifdef EMBEDDRAG
+XEvent xevent;
+XClientMessageEvent cm;
+int accept = 0;
+int x2 = 0;
+int y2 = 0;
+Atom XdndPosition = XInternAtom(display, "XdndPosition", False);
+Atom XdndStatus = XInternAtom(display, "XdndStatus", False);
+Atom XdndActionCopy = XInternAtom(display, "XdndActionCopy", False);
+Atom XdndEnter = XInternAtom(display, "XdndEnter", False);
+Atom XdndDrop = XInternAtom(display, "XdndDrop", False);
+Atom XdndLeave = XInternAtom(display, "XdndLeave", False);
+Atom XdndFinished = XInternAtom(display, "XdndFinished", False);
+#endif
+int x = 0;
+int y = 0;
+Window ignored = 0;
+int mapped2 = 0;
+#ifdef FOCUS
+int x3 = 0;
+int y3 = 0;
+Window ignored3 = 0;
+#endif
+Atom xembedatom = XInternAtom(display, "_XEMBED_INFO", False);
+
+     if((eventrun2 == 1) && parent && child)
+      {
+      plugin->eventfinish = 0;	     
+      int pending = XPending(display);
+
+      for (int i=0; i<pending; i++)
+      {
+      XEvent e;
+
+      XNextEvent(display, &e);
+
+      switch (e.type)
+      {
+      case MapNotify:  
+      if(e.xmap.window == child)
+      mapped2 = 1;     
+      break;	
+		      
+      case UnmapNotify:  
+      if(e.xmap.window == child)
+      mapped2 = 0;     
+      break;	    
+	
+#ifndef NOFOCUS	      
+      case EnterNotify:
+//      if(reaperid)
+      if(mapped2)
+      {     
+      if(e.xcrossing.focus == False)
+      {
+      XSetInputFocus(display, child, RevertToPointerRoot, CurrentTime);
+//    XSetInputFocus(display, child, RevertToParent, e.xcrossing.time);
+      }
+      }
+      break;
+#endif	      
+     
+      case PropertyNotify:
+      if (e.xproperty.atom == xembedatom) 
+      {
+#ifdef EMBEDTHREAD
+      plugin->mapok = 1;
+#else            
+      XMapWindow(display, child);
+      plugin->openGUI();
+      XSync(display, false);
+#endif      
+      }
+      break;
+
+#ifdef EMBEDDRAG
+      case ClientMessage:
+      if((e.xclient.message_type == XdndEnter) || (e.xclient.message_type == XdndPosition) || (e.xclient.message_type == XdndLeave) || (e.xclient.message_type == XdndDrop))
+      {
+
+      if(e.xclient.message_type == XdndPosition)
+      {      
+      x = 0;
+      y = 0;
+      ignored = 0;
+            
+      e.xclient.window = child;
+      XSendEvent (display, child, False, NoEventMask, &e);
+      
+      XTranslateCoordinates(display, child, XDefaultRootWindow(display), 0, 0, &x, &y, &ignored);
+      
+      x2 = e.xclient.data.l[2]  >> 16;
+      y2 = e.xclient.data.l[2] &0xffff;
+            
+      memset (&xevent, 0, sizeof(xevent));
+      xevent.xany.type = ClientMessage;
+      xevent.xany.display = display;
+      xevent.xclient.window = e.xclient.data.l[0];
+      xevent.xclient.message_type = XdndStatus;
+      xevent.xclient.format = 32;
+      xevent.xclient.data.l[0] = parent;
+      if(((x2 >= x) && (x2 <= x + width)) && ((y2 >= y) && (y2 <= y + height)))
+      {
+      accept = 1;
+      xevent.xclient.data.l[1] |= 1;
+      }
+      else
+      {
+      accept = 0;
+      xevent.xclient.data.l[1] &= ~1;
+      }
+      xevent.xclient.data.l[4] = XdndActionCopy;
+
+      XSendEvent (display, e.xclient.data.l[0], False, NoEventMask, &xevent);
+    
+      if(parentok && reaperid)
+      {
+      xevent.xclient.data.l[0] = pparent; 
+      XSendEvent (display, e.xclient.data.l[0], False, NoEventMask, &xevent);
+      }
+      }
+      else if(e.xclient.message_type == XdndDrop)
+      {
+      e.xclient.window = child;
+      XSendEvent (display, child, False, NoEventMask, &e);
+
+      memset(&cm, 0, sizeof(cm));
+      cm.type = ClientMessage;
+      cm.display = display;
+      cm.window = e.xclient.data.l[0];
+      cm.message_type = XdndFinished;
+      cm.format=32;
+      cm.data.l[0] = parent;
+      cm.data.l[1] = accept;
+      if(accept)
+      cm.data.l[2] = XdndActionCopy;
+      else
+      cm.data.l[2] = None;
+      XSendEvent(display, e.xclient.data.l[0], False, NoEventMask, (XEvent*)&cm);
+      if(parentok && reaperid)
+      {
+      cm.data.l[0] = pparent;
+      XSendEvent(display, e.xclient.data.l[0], False, NoEventMask, (XEvent*)&cm);
+      }
+      }
+      else
+      {
+      e.xclient.window = child;
+      XSendEvent (display, child, False, NoEventMask, &e);
+      }
+
+      }
+      break;
+#endif        
+      default:
+      break;                
+        }
+       }
+      plugin->eventfinish = 1;	     
+      }
+     }
+#endif
+#endif
+
 #ifdef EMBED
 #ifndef XEMBED
 #ifdef EMBEDDRAG
-void RemotePluginClient::eventloop(Display *display, Window pparent, Window parent, Window child, int width, int height, int eventrun2, int parentok, int reaperid)
+void RemotePluginClient::eventloop(Display *display, Window pparent, Window parent, Window child, int width, int height, int eventrun2, int parentok, int reaperid, RemotePluginClient *plugin)
 #else
-void RemotePluginClient::eventloop(Display *display, Window parent, Window child, int width, int height, int eventrun2, int reaperid)
+void RemotePluginClient::eventloop(Display *display, Window parent, Window child, int width, int height, int eventrun2, int reaperid, RemotePluginClient *plugin)
 #endif
 {
    if(!display)
@@ -934,6 +1089,17 @@ Atom xembedatom = XInternAtom(display, "_XEMBED_INFO", False);
       case ConfigureNotify:
 //      if((e.xconfigure.event == parent) || (e.xconfigure.event == child) || ((e.xconfigure.event == pparent) && (parentok)))
 //      {
+
+#ifdef EMBEDRESIZE
+      if(plugin->resizedone == 1)
+      {
+	  plugin->resizedone = 0;
+      XMapWindow(display, child);
+      XSync(display, false);
+      XFlush(display);
+      }
+#endif
+
       x = 0;
       y = 0;
       ignored = 0;
@@ -1078,8 +1244,9 @@ Atom xembedatom;
 #endif	
 #endif
 	
-     int editopen = 0;
-	
+    if(!effect)
+    return 0;	
+    	
     if(!plugin)
     return 0;
 	
@@ -1099,7 +1266,7 @@ Atom xembedatom;
        rp = &plugin->retRect;
        *((struct ERect **)ptr) = rp;
         
-       if(editopen == 1)
+       if(plugin->editopen == 1)
        v = 1;
        else
        v = 0;
@@ -1118,10 +1285,10 @@ Atom xembedatom;
 #else
 #ifdef EMBEDDRAG
         if(plugin->eventrun == 1)
-        plugin->eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, plugin->eventrun, plugin->parentok, plugin->reaperid);
+        plugin->eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, plugin->eventrun, plugin->parentok, plugin->reaperid, plugin);
 #else
         if(plugin->eventrun == 1)
-        plugin->eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, plugin->eventrun, plugin->reaperid);
+        plugin->eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, plugin->eventrun, plugin->reaperid, plugin);
 #endif
 #endif
 #endif
@@ -1247,6 +1414,111 @@ Atom xembedatom;
 
     case effEditOpen:
 #ifdef EMBED
+#ifdef XEMBED
+    {
+        plugin->showGUI();
+       // usleep(50000);
+
+        plugin->handle = plugin->winm->handle;
+        plugin->width = plugin->winm->width;
+        plugin->height = plugin->winm->height;
+        plugin->parent = (Window) ptr;
+        plugin->child = (Window) plugin->handle;
+
+        rp = &plugin->retRect;
+        rp->bottom = plugin->height;
+        rp->top = 0;
+        rp->right = plugin->width;
+        rp->left = 0;      
+
+        plugin->display = XOpenDisplay(0);
+
+        if(plugin->display && plugin->handle && !plugin->winm->winerror)
+        {
+        plugin->eventrun = 1; 
+             
+     //   XResizeWindow(plugin->display, plugin->parent, plugin->width, plugin->height);
+     
+       xembedatom = XInternAtom(plugin->display, "_XEMBED_INFO", False);
+                
+       data[0] = 0;
+       data[1] = 1;
+                
+       XChangeProperty(plugin->display, plugin->child, xembedatom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *) data, 2);  
+       
+#ifdef EMBEDDRAG
+       plugin->root = 0;
+       plugin->children = 0;
+       plugin->numchildren = 0;
+
+       attr = {0};
+       attr.event_mask = NoEventMask;
+
+       plugin->x11_win = XCreateWindow(plugin->display, DefaultRootWindow(plugin->display), 0, 0, 1, 1, 0, 0, InputOnly, CopyFromParent, CWEventMask, &attr);
+
+       if(plugin->x11_win)
+       {
+       XdndProxy = XInternAtom(plugin->display, "XdndProxy", False);
+
+       XdndAware = XInternAtom(plugin->display, "XdndAware", False);
+       version = 5;
+       XChangeProperty(plugin->display, plugin->x11_win, XdndAware, XA_ATOM, 32, PropModeReplace, (unsigned char*)&version, 1);
+
+       plugin->parentok = 0;
+
+       if(XQueryTree(plugin->display, plugin->parent, &plugin->root, &plugin->pparent, &plugin->children, &plugin->numchildren) != 0)
+       {
+       if(plugin->children)
+       XFree(plugin->children);
+       if((plugin->pparent != plugin->root) && (plugin->pparent != 0))
+       plugin->parentok = 1;
+       }
+	       
+       if(plugin->parentok == 0)
+       plugin->pparent = 0;
+       
+       if(plugin->parentok && plugin->reaperid)
+       XChangeProperty(plugin->display, plugin->pparent, XdndProxy, XA_WINDOW, 32, PropModeReplace, (unsigned char*)&plugin->x11_win, 1);
+       else
+       XChangeProperty(plugin->display, plugin->parent, XdndProxy, XA_WINDOW, 32, PropModeReplace, (unsigned char*)&plugin->x11_win, 1);
+
+       XChangeProperty(plugin->display, plugin->x11_win, XdndProxy, XA_WINDOW, 32, PropModeReplace, (unsigned char*)&plugin->x11_win, 1);
+       }
+       #endif
+	       
+#ifdef FOCUS
+      XSelectInput(plugin->display, plugin->parent, SubstructureRedirectMask | StructureNotifyMask | SubstructureNotifyMask);
+      XSelectInput(plugin->display, plugin->child, SubstructureRedirectMask | StructureNotifyMask | SubstructureNotifyMask | EnterWindowMask | LeaveWindowMask | PropertyChangeMask); 
+#else 
+      XSelectInput(plugin->display, plugin->parent, SubstructureRedirectMask | StructureNotifyMask | SubstructureNotifyMask);
+      XSelectInput(plugin->display, plugin->child, SubstructureRedirectMask | StructureNotifyMask | SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask);	   
+#endif
+	            
+      XReparentWindow(plugin->display, plugin->child, plugin->parent, 0, 0);
+      
+     sendXembedMessage(plugin->display, plugin->child, XEMBED_EMBEDDED_NOTIFY, 0, plugin->parent, 0);      
+              
+#ifdef EMBEDTHREAD
+        plugin->runembed = 1;  
+#endif            
+        plugin->displayerr = 0;
+        }
+       else
+       {
+       plugin->displayerr = 1;
+       plugin->eventrun = 0;
+       plugin->editopen = 0;
+       if(plugin->display)
+       {
+       XSync(plugin->display, true);
+       XCloseDisplay(plugin->display);
+       plugin->display = 0; 
+       } 
+       v=0;
+       break;	             
+       }
+     }   
+#else
     {
         plugin->showGUI();
       //  usleep(50000);
@@ -1261,32 +1533,13 @@ Atom xembedatom;
        rp->bottom = plugin->height;
        rp->top = 0;
        rp->right = plugin->width;
-       rp->left = 0;
-	    
-       if(plugin->winm->winerror)
-       {
-       plugin->displayerr = 1;
-       plugin->eventrun = 0;	       
-       break;	       
-       }
-       
-       if(!plugin->handle)
-       {
-       plugin->displayerr = 1;
-       plugin->eventrun = 0;
-       break;
-       }
+       rp->left = 0;   
 
        plugin->display = XOpenDisplay(0);
 
-       if(!plugin->display)
-       {
-       plugin->displayerr = 1;
-       plugin->eventrun = 0;
-       break;
-       }	    
-	    
-       plugin->eventrun = 1;  
+	   if(plugin->display && plugin->handle && !plugin->winm->winerror)
+       {	
+       plugin->eventrun = 1; 
             
 #ifdef XECLOSE
        data[0] = 0;
@@ -1361,38 +1614,48 @@ Atom xembedatom;
        plugin->openGUI();
 #endif          
        plugin->displayerr = 0;   
+       }
+       else
+       {
+       plugin->displayerr = 1;
+       plugin->eventrun = 0;
+       plugin->editopen = 0;
+       if(plugin->display)
+       {
+       XSync(plugin->display, true);
+       XCloseDisplay(plugin->display);
+       plugin->display = 0; 
+       } 
+       v=0;
+       break;	       
+       }
      }
+#endif
 #else
         plugin->showGUI();
 #endif
-	   editopen = 1;	
+	plugin->editopen = 1;	
 	v=1;		    
         break;
 
         case effEditClose:
+    	if(plugin->editopen == 1)
+        {        
 #ifdef EMBED                      
-        if(plugin->displayerr == 1)
-	    {
-        if(plugin->display)
-	    {
-        XSync(plugin->display, true);
-        XCloseDisplay(plugin->display);
-	    }	
-        break;
-	    }			    
+#ifndef XEMBED 	    			    
 #ifdef XECLOSE 
         plugin->eventrun = 0;  
-	XSync(plugin->display, true);	
+    	XSync(plugin->display, true);	
 		 
         plugin->xeclose = 1;
-        plugin->sendXembedMessage(plugin->display, plugin->child, XEMBED_EMBEDDED_NOTIFY, 0, plugin->parent, 0);
+        sendXembedMessage(plugin->display, plugin->child, XEMBED_EMBEDDED_NOTIFY, 0, plugin->parent, 0);
 
         for(int i2=0;i2<5000;i2++)
         {
 #ifdef EMBEDDRAG
-        plugin->eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->parentok, plugin->reaperid);
+        eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->parentok, plugin->reaperid, plugin);
 #else
-        plugin->eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->reaperid);
+        eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->reaperid, plugin);
 #endif
 
         if(plugin->xeclose == 2)
@@ -1402,24 +1665,35 @@ Atom xembedatom;
 	plugin->xeclose = 0;
 	
 	XSync(plugin->display, false);	  	    
-#endif       
+#else
+       XReparentWindow(plugin->display, plugin->child, XDefaultRootWindow(plugin->display), 0, 0);  
+       XSync(plugin->display, false);	
+#endif        
+#endif
+
         plugin->hideGUI();	 
            
-        if(plugin->display)
-        {
 #ifdef EMBEDDRAG
         if(plugin->x11_win)
         XDestroyWindow (plugin->display, plugin->x11_win);
         plugin->x11_win = 0;
-#endif      	  	 
+#endif      	  	  
+        XSync(plugin->display, false);	 	  	 
         XCloseDisplay(plugin->display);
-        plugin->display = 0; 
-        }  		    
+        plugin->display = 0;        		    
 #else            
         plugin->hideGUI();
+#endif 
+
+#ifdef EMBED
+#ifndef XECLOSE
+    plugin->eventrun = 0; 
 #endif  
-	editopen = 0;	
-		    
+#endif       
+	plugin->editopen = 0;
+	
+    }	
+    
 	v=1;		    
         break;
 
@@ -1477,22 +1751,23 @@ Atom xembedatom;
         break;
 	    
         case effClose:         
-     	if(editopen == 1)
+     	if(plugin->editopen == 1)
         {
-#ifdef EMBED		    
+#ifdef EMBED		
+#ifndef XEMBED    
 #ifdef XECLOSE
         plugin->eventrun = 0;  
         XSync(plugin->display, true);	
 		 
         plugin->xeclose = 1;
-        plugin->sendXembedMessage(plugin->display, plugin->child, XEMBED_EMBEDDED_NOTIFY, 0, plugin->parent, 0);
+        sendXembedMessage(plugin->display, plugin->child, XEMBED_EMBEDDED_NOTIFY, 0, plugin->parent, 0);
 
         for(int i2=0;i2<5000;i2++)
         {
 #ifdef EMBEDDRAG
-        plugin->eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->parentok, plugin->reaperid);
+        eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->parentok, plugin->reaperid, plugin);
 #else
-        plugin->eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->reaperid);
+        eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->reaperid, plugin);
 #endif
 
         if(plugin->xeclose == 2)
@@ -1502,22 +1777,32 @@ Atom xembedatom;
 	plugin->xeclose = 0;
 	
 	XSync(plugin->display, false);	  	    
+#else
+       XReparentWindow(plugin->display, plugin->child, XDefaultRootWindow(plugin->display), 0, 0);  
+       XSync(plugin->display, false);	
 #endif  
+#endif
 #endif		
         plugin->hideGUI();
-        }	
+        	
 #ifdef EMBED		
-        if(plugin->display)
-        {
 #ifdef EMBEDDRAG
         if(plugin->x11_win)
         XDestroyWindow (plugin->display, plugin->x11_win);
         plugin->x11_win = 0;
-#endif      	  	 
+#endif  
+  	  	XSync(plugin->display, false);	 
         XCloseDisplay(plugin->display);
-        plugin->display = 0; 
-        }  		       
-#endif            		    
+        plugin->display = 0;           
+#endif  
+	    }    
+
+#ifdef EMBED	    
+#ifndef XECLOSE
+    plugin->eventrun = 0; 
+#endif 
+#endif       
+    	          		    
 	plugin->effVoidOp(effClose);	    
 
 /*
@@ -1539,7 +1824,12 @@ Atom xembedatom;
         usleep(500000);
 #endif
 */
-     //   wait(NULL);	        	    
+/*
+#ifndef BITWIG		    
+        wait(NULL);
+#endif
+*/
+		    
         delete plugin;				          
         break;
 
@@ -2181,7 +2471,7 @@ ptr = (int *)m_shm;
     for (int i=0;i<4000;i++)
     {
         usleep(10000);
-        if (*ptr == 300)
+        if (*ptr == 310)
          {
             startok = 1;
             break;
@@ -2964,6 +3254,7 @@ void RemotePluginClient::process(float **inputs, float **outputs, int sampleFram
     commitWrite(&m_shmControl2->ringBuffer);
     waitForServer2();  
     m_updateio = 0;
+    return;
     }
 	
     if (((m_numInputs + m_numOutputs) * m_bufferSize * sizeof(float)) >= (PROCESSSIZE))
@@ -3039,6 +3330,7 @@ void RemotePluginClient::processdouble(double **inputs, double **outputs, int sa
     commitWrite(&m_shmControl2->ringBuffer);
     waitForServer2();  
     m_updateio = 0;
+    return;
     }
 	
     if (((m_numInputs + m_numOutputs) * m_bufferSize * sizeof(double)) >= (PROCESSSIZE))
