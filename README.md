@@ -60,6 +60,10 @@ Start up the linux DAW and point it to scan the folder containing the windows vs
 
 Binary LinVst-X releases are available at https://github.com/osxmidi/LinVst-X/releases
 
+## Make
+
+To make see https://github.com/osxmidi/LinVst/tree/master/Make-Guide
+
 ## Symlinks
 
 Symlinks can be used for convenience if wanted.
