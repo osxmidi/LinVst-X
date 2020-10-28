@@ -379,8 +379,8 @@ RemoteVSTServer::RemoteVSTServer(std::string fileIdentifiers, std::string fallba
     RemotePluginServer(fileIdentifiers),
     m_name(fallbackName),
     m_maker(""),
-    bufferSize(0),
-    sampleRate(0),
+    bufferSize(512),
+    sampleRate(44100),
     setprogrammiss(0),
     hostreaper(0),
 #ifdef WAVES
@@ -603,10 +603,6 @@ void RemoteVSTServer::EffectOpen()
 	
     m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
 	
-    m_plugin->dispatcher( m_plugin, effSetBlockSize, 0, 1024, NULL, 0);
-
-    m_plugin->dispatcher( m_plugin, effSetSampleRate, 0, 0, NULL, (float)44100);
-
     char buffer[512];
     memset(buffer, 0, sizeof(buffer));
 	
