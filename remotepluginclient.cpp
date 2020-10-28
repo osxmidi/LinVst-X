@@ -1874,11 +1874,11 @@ void RemotePluginClient::ServerConnect(Dl_info info)
     else if (child == 0)
     {
 // for (int fd=3; fd<256; fd++) (void) close(fd);
-
+/*
 int maxfd=sysconf(_SC_OPEN_MAX);
 for(int fd=3; fd<maxfd; fd++)
     close(fd);	    
-	    
+*/	    
 #ifdef EMBED
 #ifdef VST6432
     if (dlltype == 2)
