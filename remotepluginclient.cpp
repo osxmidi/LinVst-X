@@ -1648,14 +1648,14 @@ Atom xembedatom;
     	XSync(plugin->display, true);	
 		 
         plugin->xeclose = 1;
-        sendXembedMessage(plugin->display, plugin->child, XEMBED_EMBEDDED_NOTIFY, 0, plugin->parent, 0);
+        plugin->sendXembedMessage(plugin->display, plugin->child, XEMBED_EMBEDDED_NOTIFY, 0, plugin->parent, 0);
 
         for(int i2=0;i2<5000;i2++)
         {
 #ifdef EMBEDDRAG
-        eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->parentok, plugin->reaperid, plugin);
+        plugin->eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->parentok, plugin->reaperid, plugin);
 #else
-        eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->reaperid, plugin);
+        plugin->eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->reaperid, plugin);
 #endif
 
         if(plugin->xeclose == 2)
@@ -1760,14 +1760,14 @@ Atom xembedatom;
         XSync(plugin->display, true);	
 		 
         plugin->xeclose = 1;
-        sendXembedMessage(plugin->display, plugin->child, XEMBED_EMBEDDED_NOTIFY, 0, plugin->parent, 0);
+        plugin->sendXembedMessage(plugin->display, plugin->child, XEMBED_EMBEDDED_NOTIFY, 0, plugin->parent, 0);
 
         for(int i2=0;i2<5000;i2++)
         {
 #ifdef EMBEDDRAG
-        eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->parentok, plugin->reaperid, plugin);
+        plugin->eventloop(plugin->display, plugin->pparent, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->parentok, plugin->reaperid, plugin);
 #else
-        eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->reaperid, plugin);
+        plugin->eventloop(plugin->display, plugin->parent, plugin->child, plugin->width, plugin->height, 1, plugin->reaperid, plugin);
 #endif
 
         if(plugin->xeclose == 2)
