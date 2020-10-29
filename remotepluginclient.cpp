@@ -142,7 +142,7 @@ else
                 case audioMasterIOChanged:
                 
                     memcpy(&am, &m_shm3[FIXED_SHM_SIZE3], sizeof(am));
-                     printf("client %d %d %d \n", am.incount, am.outcount, am.delay);
+                  //   printf("client %d %d %d \n", am.incount, am.outcount, am.delay);
                  //   if((am.incount != m_numInputs) || (am.outcount != m_numOutputs) || (am.delay != m_delay))
                   //  {
 					if((am.incount != m_numInputs) || (am.outcount != m_numOutputs))
@@ -150,7 +150,7 @@ else
                     if ((am.incount + am.outcount) * m_bufferSize * sizeof(float) < (PROCESSSIZE))
                     {
 						
-						printf("up\n");
+						// printf("up\n");
 						
                     m_updateio = 1;
                     m_updatein = am.incount;
@@ -163,7 +163,7 @@ else
                     {
 					m_delay = am.delay;	
                     theEffect->initialDelay = am.delay;
-                    printf("del\n");
+                   // printf("del\n");
 				    }
                     retval = 0;
                     retval = m_audioMaster(theEffect, audioMasterIOChanged, 0, 0, 0, 0);
