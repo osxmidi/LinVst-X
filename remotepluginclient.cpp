@@ -2471,7 +2471,7 @@ ptr = (int *)m_shm;
     for (int i=0;i<4000;i++)
     {
         usleep(10000);
-        if (*ptr == 310)
+        if (*ptr == 315)
          {
             startok = 1;
             break;
