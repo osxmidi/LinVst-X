@@ -62,8 +62,7 @@ Binary LinVst-X releases are available at https://github.com/osxmidi/LinVst-X/re
 
 ## Common Problems/Possible Fixes
 
-To enable window resizing, use the Makefiles in the Resize folder (just copy them to the main LinVst-X folder).
-If window resizing is not enabled then after a resize the UI needs to be closed and then reopened for the new window size to take effect.
+If window resizing does not work, then after a resize the UI needs to be closed and then reopened for the new window size to take effect.
 
 If a LinVst version error pops up then LinVst probably needs to be reinstalled to /usr/bin and the older (renamed) linvst.so files in the vst dll folder need to be overwritten (using linvstconvert or linvstconvertree).
 
