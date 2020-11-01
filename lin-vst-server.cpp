@@ -2320,7 +2320,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx, int c
     
     if (signal(SIGTERM, SIGTERM_handler) == SIG_ERR) 
     {
-    printf("SIGTERM handler error\n");
+    cerr << "SIGTERM handler error\n" << endl;
     }
   
 #ifdef EMBED           
@@ -2347,7 +2347,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx, int c
          
     if(ShmID2 == -1)
     {
-    printf("ComMemCreateError\n");
+    cerr << "ComMemCreateError\n" << endl;
     exit(0);
     }
 
@@ -2369,7 +2369,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx, int c
     sptr = (int *)ShmPTR2;
     else
     {
-    printf("ComMemCreateError2\n");
+    cerr << "ComMemCreateError2\n" << endl;
     exit(0);
     }
     
@@ -2437,7 +2437,7 @@ DWORD dwElapsed;
 
     if (!RegisterClassEx(&wclass[pidx]))
     {
-    printf("RegClassErr\n");
+    cerr << "RegClassErr\n" << endl;
     sched_yield();	     
     SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent);   
 	break;
@@ -2453,7 +2453,7 @@ DWORD dwElapsed;
 
     if(!hWndvst[pidx])
     {
-	printf("WindowCreateErr\n");
+    cerr << "WindowCreateErr\n" << endl;
     sched_yield();	     
     SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent);	
     break;
@@ -2470,7 +2470,7 @@ DWORD dwElapsed;
  
     if (!remoteVSTServerInstance2[pidx]->rect)
     {
-    printf("RectErr\n"); 
+    cerr << "RectErr\n" << endl;
     remoteVSTServerInstance2[pidx]->winm->winerror = 1; 
     sched_yield();	     
     SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent);    
@@ -2599,7 +2599,7 @@ DWORD dwElapsed;
     remoteVSTServerInstance2[pidx]->libHandle = LoadLibrary(libnamesync);
     if (!remoteVSTServerInstance2[pidx]->libHandle)
     {
-    printf("MplugLibraryErr\n");  
+    cerr << "MplugLibraryErr\n" << endl;  
     remoteVSTServerInstance2[pidx]->plugerr = 1;
     hcidx = 512000;
     sched_yield();	
@@ -2627,7 +2627,7 @@ DWORD dwElapsed;
     remoteVSTServerInstance2[pidx]->m_plugin = getinstance(hostCallback3);
     if (!remoteVSTServerInstance2[pidx]->m_plugin)
     {
-    printf("MplugInstanceErr\n");  
+    cerr << "MplugInstanceErr\n" << endl;
     remoteVSTServerInstance2[pidx]->plugerr = 1;
     hcidx = 512000;
     sched_yield();	
@@ -2727,7 +2727,7 @@ DWORD dwElapsed;
     }
     else
     {
-    printf("CmdlineErr\n");
+    cerr << "CmdlineErr\n" << endl;
     continue;
     }
 
@@ -2774,7 +2774,7 @@ DWORD dwElapsed;
 
     if (!ThreadHandlevst[plugincount])
     {
-    printf("ThreadErr\n");
+    cerr << "ThreadErr\n" << endl;
 
  	sched_yield();
 #ifdef VST32SERVER
