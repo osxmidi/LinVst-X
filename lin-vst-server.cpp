@@ -2300,21 +2300,21 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx, int c
     VstEntry getinstance;
     DWORD dwWaitResult10;
      
-    cout << "DSSI VST plugin server v" << RemotePluginVersion << endl;
-    cout << "Copyright (c) 2012-2013 Filipe Coelho" << endl;
-    cout << "Copyright (c) 2010-2011 Kristian Amlie" << endl;
-    cout << "Copyright (c) 2004-2006 Chris Cannam" << endl;
+    cerr << "DSSI VST plugin server v" << RemotePluginVersion << endl;
+    cerr << "Copyright (c) 2012-2013 Filipe Coelho" << endl;
+    cerr << "Copyright (c) 2010-2011 Kristian Amlie" << endl;
+    cerr << "Copyright (c) 2004-2006 Chris Cannam" << endl;
     #ifdef EMBED
     #ifdef VST32SERVER
-    cout << "LinVst-X version 3.1.5-32bit" << endl;
+    cerr << "LinVst-X version 3.1.5-32bit" << endl;
     #else
-    cout << "LinVst-X version 3.1.5-64bit" << endl;    
+    cerr << "LinVst-X version 3.1.5-64bit" << endl;    
     #endif
     #else
     #ifdef VST32SERVER
-    cout << "LinVst-X version 3.1.5st-32bit" << endl;
+    cerr << "LinVst-X version 3.1.5st-32bit" << endl;
     #else
-    cout << "LinVst-X version 3.1.5st-64bit" << endl;    
+    cerr << "LinVst-X version 3.1.5st-64bit" << endl;    
     #endif    
     #endif
     
@@ -2762,7 +2762,7 @@ DWORD dwElapsed;
     SetCurrentDirectory(pathName.c_str());
     */
     
-    cout << "Loading  " << libname << endl;  
+    cerr << "Loading  " << libname << endl;  
             
     strcpy(args->fileInfo, fileInfo);
     strcpy(args->libname, libname);
