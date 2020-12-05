@@ -93,7 +93,7 @@ RemotePluginServer::RemotePluginServer(std::string fileIdentifiers) :
     starterror(0)
     {
     char tmpFileBase[60];
-    int startok;
+ //   int startok;
 
     sprintf(tmpFileBase, "/vstrplugin_shm_%s", fileIdentifiers.substr(0, 6).c_str());
 
@@ -240,6 +240,8 @@ RemotePluginServer::RemotePluginServer(std::string fileIdentifiers) :
         return;        
     }
 
+    /*
+
     startok = 0;
 
     int *ptr;
@@ -271,6 +273,8 @@ RemotePluginServer::RemotePluginServer(std::string fileIdentifiers) :
 
    if(*ptr == 3)
    m_386run = 1;
+    
+   */
 	    
 //   timeinfo = new VstTimeInfo;
      timeinfo = &timeinfo2;  
@@ -495,9 +499,9 @@ int RemotePluginServer::sizeShm()
         perror("mlock fail1");
     }
 
-    ptr = (int *)m_shm;
+//    ptr = (int *)m_shm;
 
-    *ptr = 315;
+//    *ptr = 320;
 	
      return 0;	
 }
