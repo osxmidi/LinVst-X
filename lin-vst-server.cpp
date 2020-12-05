@@ -2132,7 +2132,8 @@ DWORD dwWaitResult;
       if(remoteVSTServerInstance2[idx]->plugerr == 1)
       {
       cerr << "Load Error" << endl;
-      sched_yield();      
+      sched_yield();     
+      /* 
       remoteVSTServerInstance2[idx]->writeOpcodering(&remoteVSTServerInstance2[idx]->m_shmControl->ringBuffer, (RemotePluginOpcode)disconnectserver);
       remoteVSTServerInstance2[idx]->commitWrite(&remoteVSTServerInstance2[idx]->m_shmControl->ringBuffer);
       remoteVSTServerInstance2[idx]->waitForServer();  
@@ -2140,7 +2141,10 @@ DWORD dwWaitResult;
       remoteVSTServerInstance2[idx]->waitForClient3exit();
       remoteVSTServerInstance2[idx]->waitForClient4exit();
       remoteVSTServerInstance2[idx]->waitForClient5exit();
-      usleep(5000000);    
+      */
+      ptr = (int *)remoteVSTServerInstance2[idx]->m_shm;
+     *ptr = 1000;      
+      usleep(5000);     
       sched_yield();        
       if(remoteVSTServerInstance2[idx])
       delete remoteVSTServerInstance2[idx];           
@@ -2154,6 +2158,49 @@ DWORD dwWaitResult;
   //    ExitThread(0);
       return 0;  
       }  
+      
+      ptr = (int *)remoteVSTServerInstance2[idx]->m_shm;
+     *ptr = 320;      
+//      usleep(5000); 
+      
+int startok;
+
+    startok = 0;
+
+    for (int i=0;i<4000;i++)
+    {
+        usleep(10000);
+        if ((*ptr == 2) || (*ptr == 3))
+         {      
+         startok = 1;
+            break;
+         }
+	    
+         if (*ptr == 4)
+         {      
+         startok = 0;
+            break;
+         }
+    }  
+
+      if(startok == 0)
+      {
+      sched_yield();        
+      if(remoteVSTServerInstance2[idx])
+      delete remoteVSTServerInstance2[idx];           
+      sched_yield();
+      remoteVSTServerInstance2[idx] = 0;          
+      sched_yield();	
+      if(ThreadHandlevst[idx])
+      CloseHandle(ThreadHandlevst[idx]);      
+      sched_yield();   
+      realplugincount--;
+  //    ExitThread(0);
+      return 0;  
+      }
+
+      if(*ptr == 3)
+      remoteVSTServerInstance2[idx]->m_386run = 1;
       
       if(remoteVSTServerInstance2[idx]->m_plugin->flags & effFlagsHasEditor)
       remoteVSTServerInstance2[idx]->haveGui = true;
@@ -2306,15 +2353,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx, int c
     cerr << "Copyright (c) 2004-2006 Chris Cannam" << endl;
     #ifdef EMBED
     #ifdef VST32SERVER
-    cerr << "LinVst-X version 3.1.5-32bit" << endl;
+    cerr << "LinVst-X version 3.2-32bit" << endl;
     #else
-    cerr << "LinVst-X version 3.1.5-64bit" << endl;    
+    cerr << "LinVst-X version 3.2-64bit" << endl;    
     #endif
     #else
     #ifdef VST32SERVER
-    cerr << "LinVst-X version 3.1.5st-32bit" << endl;
+    cerr << "LinVst-X version 3.2st-32bit" << endl;
     #else
-    cerr << "LinVst-X version 3.1.5st-64bit" << endl;    
+    cerr << "LinVst-X version 3.2st-64bit" << endl;    
     #endif    
     #endif
     
