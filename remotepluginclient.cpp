@@ -2468,7 +2468,7 @@ ptr = (int *)m_shm;
         break;		    
 	    
         usleep(10000);
-        if (*ptr == 315)
+        if (*ptr == 320)
          {
             startok = 1;
             break;
