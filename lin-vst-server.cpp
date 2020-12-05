@@ -2047,7 +2047,8 @@ char fileInfo[4096];
 char libname[4096];
 int idx;
 int loaderr;
-DWORD dwWaitResult;	
+DWORD dwWaitResult;
+int *ptr;	
 
       threadargs *args;
       args = (threadargs *) parameter;
