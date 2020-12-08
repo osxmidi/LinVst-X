@@ -2091,7 +2091,8 @@ int *ptr;
       remoteVSTServerInstance2[idx]->waitForClient2exit();
       remoteVSTServerInstance2[idx]->waitForClient3exit();
       remoteVSTServerInstance2[idx]->waitForClient4exit();
-      remoteVSTServerInstance2[idx]->waitForClient5exit();	      
+      remoteVSTServerInstance2[idx]->waitForClient5exit();	
+      usleep(5000000);       
       delete remoteVSTServerInstance2[idx]; 
       }	      
       sched_yield();
