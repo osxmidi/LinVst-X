@@ -2081,10 +2081,19 @@ int *ptr;
         
       if(remoteVSTServerInstance2[idx]->starterror == 1)
       {
-      cerr << "ERROR: Remote VST startup failed and/or mismatched LinVst versions" << endl;
+      cerr << "ERROR: Remote VST start error" << endl;
       sched_yield();      
       if(remoteVSTServerInstance2[idx])
-      delete remoteVSTServerInstance2[idx];           
+      {	 
+      remoteVSTServerInstance2[idx]->writeOpcodering(&remoteVSTServerInstance2[idx]->m_shmControl->ringBuffer, (RemotePluginOpcode)disconnectserver);
+      remoteVSTServerInstance2[idx]->commitWrite(&remoteVSTServerInstance2[idx]->m_shmControl->ringBuffer);
+      remoteVSTServerInstance2[idx]->waitForServer();  
+      remoteVSTServerInstance2[idx]->waitForClient2exit();
+      remoteVSTServerInstance2[idx]->waitForClient3exit();
+      remoteVSTServerInstance2[idx]->waitForClient4exit();
+      remoteVSTServerInstance2[idx]->waitForClient5exit();	      
+      delete remoteVSTServerInstance2[idx]; 
+      }	      
       sched_yield();
       remoteVSTServerInstance2[idx] = 0;          
       sched_yield();	
