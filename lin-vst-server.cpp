@@ -2068,6 +2068,7 @@ int *ptr;
       if(!remoteVSTServerInstance2[idx])
       {
       cerr << "ERROR: Remote VST startup failed" << endl;
+      usleep(5000000);        
       sched_yield();      
       remoteVSTServerInstance2[idx] = 0;          
       sched_yield();	
