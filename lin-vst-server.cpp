@@ -2069,18 +2069,6 @@ int *ptr;
       {
       cerr << "ERROR: Remote VST startup failed" << endl;
       sched_yield();      
-      remoteVSTServerInstance2[idx]->writeOpcodering(&remoteVSTServerInstance2[idx]->m_shmControl->ringBuffer, (RemotePluginOpcode)disconnectserver);
-      remoteVSTServerInstance2[idx]->commitWrite(&remoteVSTServerInstance2[idx]->m_shmControl->ringBuffer);
-      remoteVSTServerInstance2[idx]->waitForServer();  
-      remoteVSTServerInstance2[idx]->waitForClient2exit();
-      remoteVSTServerInstance2[idx]->waitForClient3exit();
-      remoteVSTServerInstance2[idx]->waitForClient4exit();
-      remoteVSTServerInstance2[idx]->waitForClient5exit();
-      usleep(5000000);    
-      sched_yield();        
-      if(remoteVSTServerInstance2[idx])
-      delete remoteVSTServerInstance2[idx];           
-      sched_yield();
       remoteVSTServerInstance2[idx] = 0;          
       sched_yield();	
       if(ThreadHandlevst[idx])
@@ -2095,15 +2083,6 @@ int *ptr;
       {
       cerr << "ERROR: Remote VST startup failed and/or mismatched LinVst versions" << endl;
       sched_yield();      
-      remoteVSTServerInstance2[idx]->writeOpcodering(&remoteVSTServerInstance2[idx]->m_shmControl->ringBuffer, (RemotePluginOpcode)disconnectserver);
-      remoteVSTServerInstance2[idx]->commitWrite(&remoteVSTServerInstance2[idx]->m_shmControl->ringBuffer);
-      remoteVSTServerInstance2[idx]->waitForServer();  
-      remoteVSTServerInstance2[idx]->waitForClient2exit();
-      remoteVSTServerInstance2[idx]->waitForClient3exit();
-      remoteVSTServerInstance2[idx]->waitForClient4exit();
-      remoteVSTServerInstance2[idx]->waitForClient5exit();
-      usleep(5000000);    
-      sched_yield();        
       if(remoteVSTServerInstance2[idx])
       delete remoteVSTServerInstance2[idx];           
       sched_yield();
