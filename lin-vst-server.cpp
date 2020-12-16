@@ -1935,8 +1935,7 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode, VstIn
     }
     }
 #else		    
-        if (!strcmp((char*)ptr, "sendVstEvents")
-                    || !strcmp((char*)ptr, "sendVstMidiEvent")
+		if (!strcmp((char*)ptr, "sendVstEvents")
                     || !strcmp((char*)ptr, "sendVstMidiEvent")
                     || !strcmp((char*)ptr, "receiveVstEvents")
                     || !strcmp((char*)ptr, "receiveVstMidiEvents")
