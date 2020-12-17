@@ -41,6 +41,9 @@ void* RemotePluginClient::AMThread()
    int timeout = 50;
 
     VstTimeInfo *timeInfo;
+    VstTimeInfo *timeInfo2;    
+    VstTimeInfo timeinfo2; 
+    timeInfo2 = &timeinfo2;      
 
     int         els;
     int         *ptr2;
@@ -130,6 +133,11 @@ else
 
                 switch(opcode)
                 {
+                    case audioMasterSetTime:       
+                    memcpy(timeInfo2, (VstTimeInfo*)&m_shm3[FIXED_SHM_SIZE3 - (sizeof(VstTimeInfo)*2)], sizeof(VstTimeInfo));
+                    m_audioMaster(theEffect, audioMasterSetTime, 0, 0, timeInfo2, 0);
+                    break;					
+					
                     case audioMasterGetTime:       
                     val = readIntring(&m_shmControl->ringBuffer);
                     timeInfo = (VstTimeInfo *) m_audioMaster(theEffect, audioMasterGetTime, 0, val, 0, 0);
@@ -2468,7 +2476,7 @@ ptr = (int *)m_shm;
         break;		    
 	    
         usleep(10000);
-        if (*ptr == 320)
+        if (*ptr == 325)
          {
             startok = 1;
             break;
@@ -2713,7 +2721,7 @@ int RemotePluginClient::sizeShm()
 
     size_t sz = FIXED_SHM_SIZE + 1024;
     size_t sz2 = FIXED_SHM_SIZE2 + 1024 + (2 * sizeof(float));
-    size_t sz3 = FIXED_SHM_SIZE3 + 1024;
+    size_t sz3 = FIXED_SHM_SIZE3 + 1024 + (sizeof(VstTimeInfo)*2);
 
     ftruncate(m_shmFd, sz);
     m_shm = (char *)mmap(0, sz, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, m_shmFd, 0);

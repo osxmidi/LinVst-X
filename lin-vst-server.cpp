@@ -1514,6 +1514,17 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode, VstIn
     case audioMasterIdle:
         // plugin->dispatcher(plugin, effEditIdle, 0, 0, 0, 0);
         break;
+            
+    if (!exiting && effectrun && m_shm3)
+    {
+	memcpy(&m_shm3[FIXED_SHM_SIZE3 - (sizeof(VstTimeInfo)*2)], ptr, sizeof(VstTimeInfo));		
+		
+    writeOpcodering(&m_shmControl->ringBuffer, (RemotePluginOpcode)opcode);   
+    commitWrite(&m_shmControl->ringBuffer);
+    waitForServer();
+	}
+	rv = 1;
+	break;        
 
     case audioMasterGetTime:
     {	    
@@ -2150,7 +2161,7 @@ int *ptr;
       }  
       
       ptr = (int *)remoteVSTServerInstance2[idx]->m_shm;
-     *ptr = 320;      
+     *ptr = 325;      
 //      usleep(5000); 
       
 int startok;
@@ -2343,15 +2354,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx, int c
     cerr << "Copyright (c) 2004-2006 Chris Cannam" << endl;
     #ifdef EMBED
     #ifdef VST32SERVER
-    cerr << "LinVst-X version 3.2-32bit" << endl;
+    cerr << "LinVst-X version 3.2.5-32bit" << endl;
     #else
-    cerr << "LinVst-X version 3.2-64bit" << endl;    
+    cerr << "LinVst-X version 3.2.5-64bit" << endl;    
     #endif
     #else
     #ifdef VST32SERVER
-    cerr << "LinVst-X version 3.2st-32bit" << endl;
+    cerr << "LinVst-X version 3.2.5st-32bit" << endl;
     #else
-    cerr << "LinVst-X version 3.2st-64bit" << endl;    
+    cerr << "LinVst-X version 3.2.5st-64bit" << endl;    
     #endif    
     #endif
     
