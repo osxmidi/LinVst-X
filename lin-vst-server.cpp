@@ -1977,6 +1977,15 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode, VstIn
         break;
 
     case audioMasterUpdateDisplay:
+    if (!exiting && effectrun)
+    {
+    writeOpcodering(&m_shmControl->ringBuffer, (RemotePluginOpcode)opcode);
+    commitWrite(&m_shmControl->ringBuffer);
+    waitForServer();
+    retval = 0;
+    memcpy(&retval, &m_shm3[FIXED_SHM_SIZE3], sizeof(int));
+    rv = retval;
+    }	                
         break;
 
     case audioMasterBeginEdit:
