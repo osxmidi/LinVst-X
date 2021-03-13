@@ -2176,7 +2176,7 @@ int *ptr;
       }  
       
       ptr = (int *)remoteVSTServerInstance2[idx]->m_shm;
-     *ptr = 325;      
+     *ptr = 330;      
 //      usleep(5000); 
       
 int startok;
