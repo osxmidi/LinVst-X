@@ -24,7 +24,33 @@ If testvst.exe.so and/or testvst32.exe.so are in any daw search paths then they 
 
 Batch Testing
 
-For testing multiple vst dll files at once, unzip the testvst folder, then (using the terminal) cd into the unzipped testvst folder.
+-------
+
+Gui Batch Testing.
+
+testvstgui can be used to select a vst folder for testing (testvst32gui is used for testing 32 bit vst's).
+
+Unzip the testvst zip file, and then (using the terminal) cd into the unzipped testvst folder.
+
+then enter
+
+chmod +x testvst-batch
+(chmod +x testvst32-batch for 32 bit plugins)
+
+Click on (start) testvstgui and then select a folder and then press the Start button and it will cycle through the vst's in the folder.
+
+To cancel the vst cycling before all vst's are tested, open a Terminal and enter 
+kill -9 $(pgrep -f testvst-batch)
+or for 32 bit vst's
+kill -9 $(pgrep -f testvst32-batch)
+
+Starting testvstgui using a Terminal will show what vst is currently loading, so a problematic vst can be identified.
+
+-------
+
+Command Line Batch Testing.
+
+Unzip the testvst zip file, and then (using the terminal) cd into the unzipped testvst folder.
 
 then enter
 
@@ -53,5 +79,15 @@ Use testvst.exe from a folder that is not in a daw search path.
 
 If testvst.exe.so and/or testvst32.exe.so are in any daw search paths then they can cause problems if the daw tries to load them.
 
+To cancel the vst cycling before all vst's are tested, open a Terminal and enter 
+kill -9 $(pgrep -f testvst-batch)
+or for 32 bit vst's
+kill -9 $(pgrep -f testvst32-batch)
+
 -----
 
+TestVst can also be used to test dll overrides (wine dll's that are replaced by windows dll's) and if they are likely to work, without going through dll override trial and error using LinVst.
+
+The terminal output of TestVst can sometimes be used to work out what dll override might be needed (if wine dll unimplemented function errors appear in the terminal output for instance).
+
+Some plugins won't run due to various problems.
