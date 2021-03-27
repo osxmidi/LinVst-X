@@ -6,7 +6,7 @@ See LinVst3-X https://github.com/osxmidi/LinVst3 for running vst3 plugins.
 
 LinVst-X runs vst plugins in a single Wine process so plugins that communicate with each other or plugins that can use shared samples between instances will be able to communicate with their other instances.
 
-It means that plugin instances can communicate with each other (which is not possible with LinVst), for example, Voxengo GlissEQ and Fabfilter ProQ-3 instances on different tracks simultaneously displaying the track spectrums and Kontakt instances on different tracks that use the same library not having to load samples for each new instance etc.
+It means that plugin instances can communicate with each other (which is not possible with LinVst), for example, Voxengo GlissEQ instances on different tracks simultaneously displaying the track spectrums and Kontakt instances on different tracks that use the same library not having to load samples for each new instance etc.
 
 Plugins running in one process are not sandboxed, so if one plugin crashes then the whole lot might crash.
 
