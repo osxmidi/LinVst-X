@@ -2128,7 +2128,7 @@ break;
 
   // WaitForMultipleObjects(4, remoteVSTServerInstance2[idx]->ThreadHandle,
   // TRUE, 5000);
-  MsgWaitForMultipleObjects(4, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000, QS_ALLEVENTS);
+  //MsgWaitForMultipleObjects(4, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000, QS_ALLEVENTS);
 
   for (int idx50 = 0; idx50 < 100000; idx50++) {
     if (remoteVSTServerInstance2[idx]->parfin &&
@@ -2138,15 +2138,23 @@ break;
       break;
     usleep(100);
   }
+    
+  sched_yield();    
 
   if (remoteVSTServerInstance2[idx]->ThreadHandle[0])
     CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[0]);
+    
+  sched_yield();    
 
   if (remoteVSTServerInstance2[idx]->ThreadHandle[1])
     CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[1]);
+    
+  sched_yield();    
 
   if (remoteVSTServerInstance2[idx]->ThreadHandle[2])
     CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[2]);
+    
+  sched_yield();    
     
   if (remoteVSTServerInstance2[idx]->ThreadHandle[3])
     CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[3]);    
@@ -2167,6 +2175,8 @@ break;
   sched_yield();
 
   realplugincount--;
+    
+  sched_yield();   
 
   //    ExitThread(0);
 
