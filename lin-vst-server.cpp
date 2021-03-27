@@ -580,13 +580,18 @@ std::string RemoteVSTServer::getMaker() {
 
 void RemoteVSTServer::EffectOpen(ShmControl *m_shmControlptr) {
   DWORD dwWaitResult;
-
+    
+  char lpbuf2[512]; 
+  sprintf(lpbuf2, "%d", pidx);  
+  string lpbuf = "create4";
+  lpbuf = lpbuf + lpbuf2;    
+    
   if (debugLevel > 0)
     cerr << "dssi-vst-server[1]: opening plugin" << endl;
 
   sched_yield();
   ghWriteEvent4 = 0;
-  ghWriteEvent4 = CreateEvent(NULL, TRUE, FALSE, "wm_syncevent4");
+  ghWriteEvent4 = CreateEvent(NULL, TRUE, FALSE, lpbuf.c_str());
   while (0 ==
          PostThreadMessage(mainThreadId, WM_SYNC4, (WPARAM)pidx, (LPARAM)wname))
     sched_yield();
@@ -711,10 +716,15 @@ void RemoteVSTServer::EffectOpen(ShmControl *m_shmControlptr) {
 
 RemoteVSTServer::~RemoteVSTServer() {
   DWORD dwWaitResult;
+    
+  char lpbuf2[512]; 
+  sprintf(lpbuf2, "%d", pidx);  
+  string lpbuf = "create5";
+  lpbuf = lpbuf + lpbuf2;    
 
   sched_yield();
   ghWriteEvent5 = 0;
-  ghWriteEvent5 = CreateEvent(NULL, TRUE, FALSE, "wm_syncevent5");
+  ghWriteEvent5 = CreateEvent(NULL, TRUE, FALSE, lpbuf.c_str());
   while (0 ==
          PostThreadMessage(mainThreadId, WM_SYNC5, (WPARAM)pidx, (LPARAM)wname))
     sched_yield();
@@ -1091,6 +1101,11 @@ bool RemoteVSTServer::warn(std::string warning) {
 
 void RemoteVSTServer::showGUI(ShmControl *m_shmControlptr) {
   DWORD dwWaitResult;
+    
+  char lpbuf2[512]; 
+  sprintf(lpbuf2, "%d", pidx);  
+  string lpbuf = "create1";
+  lpbuf = lpbuf + lpbuf2;    
 
   winm->winerror = 0;
 
@@ -1111,7 +1126,7 @@ void RemoteVSTServer::showGUI(ShmControl *m_shmControlptr) {
 
   ghWriteEvent = 0;
 
-  ghWriteEvent = CreateEvent(NULL, TRUE, FALSE, "wm_syncevent");
+  ghWriteEvent = CreateEvent(NULL, TRUE, FALSE, lpbuf.c_str());
 
   while (0 ==
          PostThreadMessage(mainThreadId, WM_SYNC, (WPARAM)pidx, (LPARAM)wname))
@@ -1158,13 +1173,18 @@ void RemoteVSTServer::hideGUI2() {
 
 void RemoteVSTServer::hideGUI() {
   DWORD dwWaitResult;
+    
+  char lpbuf2[512]; 
+  sprintf(lpbuf2, "%d", pidx);  
+  string lpbuf = "create2";
+  lpbuf = lpbuf + lpbuf2;      
 
   if ((haveGui == false) || (guiVisible == false))
     return;
 
   sched_yield();
   ghWriteEvent2 = 0;
-  ghWriteEvent2 = CreateEvent(NULL, TRUE, FALSE, "wm_syncevent2");
+  ghWriteEvent2 = CreateEvent(NULL, TRUE, FALSE, lpbuf.c_str());
 
   while (0 == PostThreadMessage(mainThreadId, WM_SYNC2, (WPARAM)pidx, 0))
     sched_yield();
@@ -1185,10 +1205,15 @@ void RemoteVSTServer::hideGUI() {
 #ifdef EMBED
 void RemoteVSTServer::openGUI() {
   DWORD dwWaitResult;
+    
+  char lpbuf2[512]; 
+  sprintf(lpbuf2, "%d", pidx);  
+  string lpbuf = "create3";
+  lpbuf = lpbuf + lpbuf2;      
 
   sched_yield();
   ghWriteEvent3 = 0;
-  ghWriteEvent3 = CreateEvent(NULL, TRUE, FALSE, "wm_syncevent3");
+  ghWriteEvent3 = CreateEvent(NULL, TRUE, FALSE, lpbuf.c_str());
 
   while (0 ==
          PostThreadMessage(mainThreadId, WM_SYNC3, (WPARAM)pidx, (LPARAM)wname))
@@ -1910,6 +1935,11 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   strcpy(libname, args->libname);
 
   idx = args->idx;
+    
+  char lpbuf2[512]; 
+  sprintf(lpbuf2, "%d", idx);  
+  string lpbuf = "create7";
+  lpbuf = lpbuf + lpbuf2;   
 
   loaderr = 0;
 
@@ -2058,7 +2088,7 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   remoteVSTServerInstance2[idx]->ghWriteEvent7 = 0;
 
   remoteVSTServerInstance2[idx]->ghWriteEvent7 =
-      CreateEvent(NULL, TRUE, FALSE, "wm_syncevent");
+      CreateEvent(NULL, TRUE, FALSE, lpbuf.c_str());
 
   while (0 == PostThreadMessage(mainThreadId, WM_SYNC7, (WPARAM)idx,
                                 (LPARAM)libname))
