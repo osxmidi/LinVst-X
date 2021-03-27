@@ -2671,7 +2671,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                 hcidx = 512000;
                 sched_yield();
                 SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent7);
-                ;
                 break;
               }
 
