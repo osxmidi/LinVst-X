@@ -451,18 +451,26 @@ Atom xembedatom = XInternAtom(display, "_XEMBED_INFO", False);
       y = 0;
       ignored = 0;
 
-      XTranslateCoordinates(display, parent, XDefaultRootWindow(display), 0, 0,
-&x, &y, &ignored); e.xconfigure.send_event = false; e.xconfigure.type =
-ConfigureNotify; e.xconfigure.event = child; e.xconfigure.window = child;
-      e.xconfigure.x = x;
-#ifdef TRACKTIONWM
-      if(waveformid > 0)
-      e.xconfigure.y = y + waveformid;
-      else
-      e.xconfigure.y = y;
+      	XTranslateCoordinates(display, parent, XDefaultRootWindow(display), 0, 0, &x, &y, &ignored); 
+	e.xconfigure.send_event = false; 
+	e.xconfigure.type = ConfigureNotify; 
+	e.xconfigure.event = child; 
+	e.xconfigure.window = child;
+#ifdef TRACKTIONWM  
+        if(waveformid > 0)  
+        {   
+        e.xconfigure.x = x + waveformid2;
+        e.xconfigure.y = y + waveformid;
+        }
+        else
+        {
+        e.xconfigure.x = x;
+        e.xconfigure.y = y;
+        }
 #else
-      e.xconfigure.y = y;
-#endif
+        e.xconfigure.x = x;
+        e.xconfigure.y = y;
+#endif    
       e.xconfigure.width = width;
       e.xconfigure.height = height;
       e.xconfigure.border_width = 0;
