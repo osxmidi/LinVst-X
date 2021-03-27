@@ -1124,8 +1124,19 @@ void RemoteVSTServer::showGUI(ShmControl *m_shmControlptr) {
   sched_yield();
 
   CloseHandle(ghWriteEvent);
+    
+  if (dwWaitResult != WAIT_OBJECT_0) {
+  cerr << "dssi-vst-server: ERROR: Failed to create window!\n" << endl;
+  guiVisible = false;
+  winm->handle = 0;
+  winm->width = 0;
+  winm->height = 0;
+  memcpy(m_shmControlptr->wret, winm, sizeof(winmessage));
+  }    
    
-  if(winm->winerror) {
+  if(winm->winerror == 1) {
+  cerr << "dssi-vst-server: ERROR: Failed to create window2!\n" << endl;      
+  guiVisible = false;     
   winm->handle = 0;
   winm->width = 0;
   winm->height = 0;
