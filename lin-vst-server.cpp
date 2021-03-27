@@ -1595,10 +1595,61 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode,
     break;
 
   case audioMasterSizeWindow:
-  
     if (debugLevel > 1)
       cerr << "dssi-vst-server[2]: audioMasterSizeWindow requested" << endl;
+#ifdef EMBEDRESIZE
+    {
+      int opcodegui = 123456789;
+#ifdef EMBED
+      if (hWnd && guiVisible && !exiting && effectrun && (guiupdate == 0)) {
+        if ((guiresizewidth == index) && (guiresizeheight == value)) {
+          break;
+        }
 
+        guiresizewidth = index;
+        guiresizeheight = value;
+
+        // ShowWindow(hWnd, SW_HIDE);
+        // SetWindowPos(hWnd, HWND_TOP, 0, 0, guiresizewidth, guiresizeheight,
+        // 0);
+
+/*
+#ifdef TRACKTIONWM
+        if (hosttracktion == 1)
+          SetWindowPos(
+              hWnd, HWND_TOP, GetSystemMetrics(SM_XVIRTUALSCREEN) + offset.x,
+              GetSystemMetrics(SM_YVIRTUALSCREEN) + offset.y, index, value, 0);
+#endif
+*/
+
+        m_shmControlptr->ropcode = (RemotePluginOpcode)opcode;
+        m_shmControlptr->value = index;
+        m_shmControlptr->value2 = value;
+        waitForServer(m_shmControlptr);
+        retval = 0;
+        retval = m_shmControlptr->retint;
+        rv = retval;
+        //   guiupdate = 1;
+      }
+#else
+      if (hWnd && !exiting && effectrun && guiVisible) {
+        /*
+        //    SetWindowPos(hWnd, 0, 0, 0, index + 6, value + 25, SWP_NOMOVE |
+        SWP_HIDEWINDOW); SetWindowPos(hWnd, 0, 0, 0, index + 6, value + 25,
+        SWP_NOMOVE); ShowWindow(hWnd, SW_SHOWNORMAL); UpdateWindow(hWnd);
+        */
+
+        if ((guiresizewidth == index) && (guiresizeheight == value))
+          break;
+
+        guiresizewidth = index;
+        guiresizeheight = value;
+        guiupdate = 1;
+        rv = 1;
+      }
+#endif
+    }
+#endif
     break;
 
   case audioMasterGetProductString:
