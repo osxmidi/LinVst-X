@@ -1239,14 +1239,15 @@ int RemoteVSTServer::processVstEvents() {
   int *ptr;
   int sizeidx = 0;
   int size;
-  VstEvents *evptr;
+  VstEvents *evptr;  
+  int retval;
 
   ptr = (int *)m_shm2;
   els = *ptr;
-  sizeidx = sizeof(int);
+  sizeidx = sizeof(int);  
 
-  if (els > VSTSIZE)
-    els = VSTSIZE;
+ // if (els > VSTSIZE)
+ //   els = VSTSIZE;
 
   evptr = &vstev[0];
   evptr->numEvents = els;
@@ -1258,10 +1259,10 @@ int RemoteVSTServer::processVstEvents() {
     evptr->events[i] = bsize;
     sizeidx += size;
   }
+  
+  retval = m_plugin->dispatcher(m_plugin, effProcessEvents, 0, 0, evptr, 0);
 
-  m_plugin->dispatcher(m_plugin, effProcessEvents, 0, 0, evptr, 0);
-
-  return 1;
+  return retval;
 }
 
 void RemoteVSTServer::getChunk(ShmControl *m_shmControlptr) {
@@ -1464,11 +1465,12 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode,
     break;
 
   case audioMasterProcessEvents:
-    if (debugLevel > 1)
+      if (debugLevel > 1)
       cerr << "dssi-vst-server[2]: audioMasterProcessEvents requested" << endl;
     {
       VstEvents *evnts;
       int eventnum;
+ 	  int eventnum2;       
       int *ptr2;
       int sizeidx = 0;
       int ok;
@@ -1485,13 +1487,14 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode,
         }
 
         eventnum = evnts->numEvents;
+        eventnum2 = 0;  
 
-        ptr2 = (int *)&m_shm2[FIXED_SHM_SIZE2SEND];
+        ptr2 = (int *)&m_shm3[VSTEVENTS_SEND_OFFSET];
 
         sizeidx = sizeof(int);
 
-        if (eventnum > VSTSIZE)
-          eventnum = VSTSIZE;
+     //   if (eventnum > VSTSIZE)
+     //     eventnum = VSTSIZE;
 
         for (int i = 0; i < eventnum; i++) {
           VstEvent *pEvent = evnts->events[i];
@@ -1500,18 +1503,25 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode,
           else {
             unsigned int size =
                 (2 * sizeof(VstInt32)) + evnts->events[i]->byteSize;
-            memcpy(&m_shm3[FIXED_SHM_SIZE2SEND + sizeidx], evnts->events[i],
+            memcpy(&m_shm3[VSTEVENTS_SEND_OFFSET + sizeidx], evnts->events[i],
                    size);
             sizeidx += size;
+            if((sizeidx) >= VSTEVENTS_SEND)
+            break;   
+            eventnum2++;      
           }
         }
-        *ptr2 = eventnum;
+        
+        if(eventnum2 > 0)
+        {       
+        *ptr2 = eventnum2;
 
         m_shmControlptr->ropcode = (RemotePluginOpcode)opcode;
         waitForServer(m_shmControlptr);
         retval = 0;
         retval = m_shmControlptr->retint;
         rv = retval;
+        }
       }
     }
     break;
@@ -2042,7 +2052,7 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
 
   ptr = (int *)remoteVSTServerInstance2[idx]->m_shm;
 
-  *ptr = 400;
+  *ptr = 410;
 
   for (int i = 0; i < 400000; i++) {
     if ((*ptr == 2) || (*ptr == 3)) {
@@ -2297,15 +2307,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
   cerr << "Copyright (c) 2004-2006 Chris Cannam" << endl;
 #ifdef EMBED
 #ifdef VST32SERVER
-  cerr << "LinVst-X version 4.0.1-32bit" << endl;
+  cerr << "LinVst-X version 4.1-32bit" << endl;
 #else
-  cerr << "LinVst-X version 4.0.1-64bit" << endl;
+  cerr << "LinVst-X version 4.1-64bit" << endl;
 #endif
 #else
 #ifdef VST32SERVER
-  cerr << "LinVst-X version 4.0.1st-32bit" << endl;
+  cerr << "LinVst-X version 4.1st-32bit" << endl;
 #else
-  cerr << "LinVst-X version 4.0.1st-64bit" << endl;
+  cerr << "LinVst-X version 4.1st-64bit" << endl;
 #endif
 #endif
 
