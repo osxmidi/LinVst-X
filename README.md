@@ -72,7 +72,7 @@ Binary LinVst-X releases are available at https://github.com/osxmidi/LinVst-X/re
 
 If window resizing does not work, then after a resize the UI needs to be closed and then reopened for the new window size to take effect.
 
-If a LinVst version error pops up then LinVst probably needs to be reinstalled to /usr/bin and the older (renamed) linvst.so files in the vst dll folder need to be overwritten (using linvstconvert or linvstconvertree).
+If a LinVst version error pops up then LinVst probably needs to be reinstalled to /usr/bin and the older (renamed) linvst.so files in the vst dll folder need to be overwritten (using linvstconvert).
 
 LinVst looks for wine in /usr/bin and if there isn't a /usr/bin/wine then that will probably cause problems.
 /usr/bin/wine can be a symbolic link to /opt/wine-staging/bin/wine (for wine staging) for example.
