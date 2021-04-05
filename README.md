@@ -50,25 +50,25 @@ kill -15 pid
 
 (See the Wiki page for a visual guide https://github.com/osxmidi/LinVst/wiki)
 
-Decide on what version to run, either the embedded window version or the standalone window version (the embedded version would probably be the default choice)
+Copy all of the lin-vst-serverxxxx files (files with lin-vst-server in their names) in the embedded folder to /usr/bin.
 
-Copy all of the lin-vst-server files (files with lin-vst-server in their names) from the version that was chosen to /usr/bin (either the embedded or standalone version folder)
+Install the vst's.
 
-Make a folder and place the windows vst's in it.
+The vst's will probably be installed by default to a Wine folder, something like ~/.wine/drive_c/Program Files/Steinberg/VSTPlugins (which is similar to where they are installed on Windows).
 
-Start linvstxconvert (in the convert folder) and then select the linvstx.so from the chosen embedded or standalone window version folder.
+It's also possible with most plugins to make a folder and install the windows vst's into it.
 
-Point linvstxconvert to the folder containing the windows vst's and hit the Start (Convert) button.
+Start linvstconvert (in the convert folder) and then select the linvst.so file in the embedded folder.
+
+Point linvstconvert to the folder containing the windows vst's and hit the Start (Convert) button.
 
 Start up the linux DAW and point it to scan the folder containing the windows vst's.
+
+If new vst plugins are added to a folder, then just run linvstconvert again on that folder.
 
 Binary LinVst-X releases are available at https://github.com/osxmidi/LinVst-X/releases
 
 ## Common Problems/Possible Fixes
-
-linvstxconvert will not convert vst dll's in sub folders and so some plugins might not appear after a daw scan, so if that happens then use linvstxconverttree.
-
-linvstxconverttree will convert vst dll's in all sub folders.
 
 If window resizing does not work, then after a resize the UI needs to be closed and then reopened for the new window size to take effect.
 
@@ -147,102 +147,6 @@ Add the synth vst's path to VST_PATH and start Renoise to scan it.
 Then exit renoise and edit the database file /home/user/.renoise/V3.1.0/ CachedVSTs_x64.db (enable hidden folders with right click in the file browser).
 
 Go to the "Browse Data" tab in SQLite browser and choose the CachedPlugins table and then locate the entry for the synth vst and enable the "IsSynth" flag from "0" (false) to "1" (true) and save.
-
-## More Detailed Guide
-
-To use LinVst-X, the linvstx.so file simply needs to be renamed to match the windows vst dll's filename.
-
-(the .so and .dll extensions are left as they are and are not part of the renaming)
-
-Both the windows vst dll file and the renamed linvstx.so file are then a matched pair and need to be kept together in the same directory/folder.
-
-**For Example**
-
-copy lin-vst-server.exe and lin-vst-server.so to /usr/bin
-
-copy linvstx.so to wherever the windows vst dll file is that someone wants to run in a Linux DAW, 
-and then rename linvstx.so to the windows vst dll filename 
-
-linvstx.so gets renamed to test.so for test.dll
-
-Use the renamed file (test.so) in a Linux VST capable DAW 
-
-Load test.so within the Linux DAW and then test.so will load and run the (name associated) test.dll windows vst 
-
-linvstxconvert (GUI or CLI) and linvstxconverttree can automatically batch name convert linvstx.so to mutiple windows vst dll names that are located in a folder/directory (the linvstxconvert CLI version needs to be run from within the dll's folder/directory).
-linvstxconverttree can automatically name convert folders and sub folders (directories and sub directories) of vst dll plugins.
-
-linvstxconvert needs to be run with sudo permission for folders/directories that need sudo permission.
-
-After the naming conversion, the newly created files (.so files) are ready to be used in Linux vst DAW's from the folder that was used for the naming conversion.
-
-Copying/moving plugins (and in some cases their associated presets etc) to a folder/directory with user permissions (if possible) is generally a good idea unless the vst plugin requires a fixed path.
-
-### Using a folder of windows dll files as an example.
-
-Say the folder contains 
-
-- Delay.dll
-- Compressor.dll
-- Chorus.dll
-- Synth.dll
-
-then after the renaming (using the renaming utility) the folder will look like
-
-- Delay.dll
-- Delay.so
-
-
-
-- Compressor.dll
-- Compressor.so
-
-
-
-- Chorus.dll
-- Chorus.so
-
-
-
-- Synth.dll
-- Synth.so
-
-The files ending with .so can be used inside Linux Vst DAWS to load and manage the associated dll files (ie Delay.so loads and manages Delay.dll).
-
-Say for instance that a windows vst installation has installed a windows vst named Delay.dll into the VstPlugins directory inside of a WINEPREFIX ie (~/.wine/drive_c/Program Files/VstPlugins), then the renaming utility needs to be run on the VstPlugins directory.
-
-After the renaming there is Delay.dll and Delay.so in the ~/.wine/drive_c/Program Files/VstPlugins directory.
-
-The Linux DAW plugin search path is then appended to include ~/.wine/drive_c/Program Files/VstPlugins and then the plugin(s) can be loaded.
-
-Another way is to make a symbolic link to ~/.wine/drive_c/Program Files/VstPlugins/Delay.so or to the whole ~/.wine/drive_c/Program Files/VstPlugins directory from a more convenient folder such as /home/user/vst and then append /home/user/vst to the Linux DAW's plugin search path.
-
-There can be multiple WINEPREFIXES (by default there is one ~/.wine) containing various vst dll plugins and each WINEPREFIX can have a different wine setup, including dll overrides etc.
-
-Different windows vst plugins that might require different wine setups can be installed into different WINEPREFIXES by creating a new WINEPREFIX (export WINEPREFIX=&sim;/.wine-new winecfg) and then run the windows vst installation program.
-Or by setting the WINEPREFIX environmental variable to a particular pre existing WINEPREFIX and then installing the vst into it ie export WINEPREFIX=&sim;/.wine-preexisting and then run the vst install.
-
-A particular WINEPREFIX can be configured by using winecfg with the WINEPREFIX environmental variable set to that particular WINEPREFIX ie export WINEPREFIX=~/.wine-new winecfg.
-
-When a plugin is loaded from within a WINEPREFIX, it picks up on that WINEPREFIXES individual setup (also works for symbolic links as discussed above).
-
-------
-
-linvstx.so needs to be renamed to the windows vst name (the .so and .dll extensions are left as they are and are not part of the renaming).
-
-Both the windows vst dll file and the renamed linvstx.so file need to be in the same folder/directory.
-
-linvstx.so is a Linux vst template that loads and runs any windows vst that linvstx.so is renamed to.
-
-linvstx.so can be copied and renamed multiple times to load multiple windows vst's.
-
-Basically, linvstx.so becomes the windows vst once it's renamed to the windows vst's name and can then be used in Linux vst hosts.
-
-Individual plugins can have their own WINEPREFIX environment.
-
-If a windows vst dll file and it's associated renamed linvstx.so file are located within a WINEPREFIX then the plugin will use that WINEPREFIX.
-
-Symlinks can point to renamed linvstx.so files located within a WINEPREFIX.
 
 ## Symlinks
 
