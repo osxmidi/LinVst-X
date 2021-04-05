@@ -381,6 +381,7 @@ public:
   HANDLE ghWriteEvent3;
   HANDLE ghWriteEvent4;
   HANDLE ghWriteEvent5;
+  HANDLE ghWriteEvent6;  
   HANDLE ghWriteEvent7;
 
 public:
@@ -429,7 +430,7 @@ RemoteVSTServer::RemoteVSTServer(std::string fileIdentifiers,
       getfin(0), confin(0), guiupdate(0), guiupdatecount(0), guiresizewidth(500),
       guiresizeheight(200), melda(0), winm(0), hWnd(0), hidegui(0),
       ghWriteEvent(0), ghWriteEvent2(0), ghWriteEvent3(0), ghWriteEvent4(0),
-      ghWriteEvent5(0), ghWriteEvent7(0), libHandle(0), m_plugin(0), pidx(0),
+      ghWriteEvent5(0), ghWriteEvent6(0), ghWriteEvent7(0), libHandle(0), m_plugin(0), pidx(0),
       plugerr(0), debugLevel(RemotePluginDebugNone) {
   ThreadHandle[0] = 0;
   ThreadHandle[1] = 0;
@@ -1952,8 +1953,14 @@ void RemoteVSTServer::guiUpdate() {
 */
 
 void RemoteVSTServer::finisherror() {
+   cerr << "Failed to load dll!" << endl;
+  
+  int *ptr;
+  ptr = (int *)m_shm;  
+  *ptr = 2001;
+  
   exiting = 1;
-  sleep(1);
+  //sleep(1);
 
   if (ThreadHandle[0]) {
     WaitForSingleObject(ThreadHandle[0], 5000);
@@ -2003,7 +2010,12 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   char lpbuf2[512]; 
   sprintf(lpbuf2, "%d", idx);  
   string lpbuf = "create7";
-  lpbuf = lpbuf + lpbuf2;   
+  lpbuf = lpbuf + lpbuf2;  
+  
+  char lpbuf32[512]; 
+  sprintf(lpbuf32, "%d", idx);  
+  string lpbuf3 = "create6";
+  lpbuf3 = lpbuf3 + lpbuf32;           
 
   loaderr = 0;
 
@@ -2092,7 +2104,39 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   remoteVSTServerInstance2[idx]->ThreadHandle[1] = 0;
   remoteVSTServerInstance2[idx]->ThreadHandle[2] = 0;
   remoteVSTServerInstance2[idx]->ThreadHandle[3] = 0;  
+  
+  sched_yield();
 
+  remoteVSTServerInstance2[idx]->ghWriteEvent6 = 0;
+
+  remoteVSTServerInstance2[idx]->ghWriteEvent6 =
+      CreateEvent(NULL, TRUE, FALSE, lpbuf3.c_str());
+
+  while (0 == PostThreadMessage(mainThreadId, WM_SYNC6, (WPARAM)idx,
+                                (LPARAM)libname))
+    sched_yield();
+
+  dwWaitResult =
+      WaitForSingleObject(remoteVSTServerInstance2[idx]->ghWriteEvent6, 20000);
+
+  CloseHandle(remoteVSTServerInstance2[idx]->ghWriteEvent6);
+
+  if (remoteVSTServerInstance2[idx]->plugerr == 1) {
+    cerr << "Load Error" << endl;
+    sched_yield();
+    remoteVSTServerInstance2[idx]->finisherror();
+    delete remoteVSTServerInstance2[idx];
+    sched_yield();
+    remoteVSTServerInstance2[idx] = 0;
+    sched_yield();
+    if (ThreadHandlevst[idx])
+      CloseHandle(ThreadHandlevst[idx]);
+    sched_yield();
+    realplugincount--;
+    ///      ExitThread(0);
+    return 0;
+  }  
+  
   remoteVSTServerInstance2[idx]->StartThreadFunc();
   remoteVSTServerInstance2[idx]->StartThreadFunc2();
   remoteVSTServerInstance2[idx]->StartThreadFunc3();
@@ -2591,24 +2635,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
             }
           } break;
 
-            /*
-               case WM_SYNC6:
-               {
-                   sched_yield();
-                   int pidx = (int) msg.wParam;
-
-                   if(remoteVSTServerInstance2[pidx])
-               {
-               if(libHandle)
-               FreeLibrary(libHandle);
-               sched_yield();
-               SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent6);
-               }
-               }
-               break;
-           */
-
-          case WM_SYNC7: {
+            
+            case WM_SYNC6: {
             sched_yield();
 
             memset(libnamesync, 0, 4096);
@@ -2627,7 +2655,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                 remoteVSTServerInstance2[pidx]->plugerr = 1;
                 hcidx = 512000;
                 sched_yield();
-                SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent7);
+                SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent6);
                 break;
               }
 
@@ -2649,10 +2677,25 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                   remoteVSTServerInstance2[pidx]->plugerr = 1;
                   hcidx = 512000;
                   sched_yield();
-                  SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent7);
+                  SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent6);
                   break;
                 }
+               }
+              sched_yield();
+              SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent6);               
               }
+             }
+              break;
+   
+
+          case WM_SYNC7: {
+            sched_yield();
+            int pidx = (int)msg.wParam;
+
+            hcidx = pidx;
+
+            if (remoteVSTServerInstance2[pidx]) {
+              sched_yield();
 
               remoteVSTServerInstance2[pidx]->m_plugin =
                   getinstance(hostCallback3);
@@ -2693,7 +2736,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
               sched_yield();
               SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent7);
             }
-          } break;
+           } 
+          break;
 
           case WM_TIMER: {
             if (msg.wParam >= 6788888) {
