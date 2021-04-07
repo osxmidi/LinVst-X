@@ -1954,11 +1954,7 @@ void RemoteVSTServer::guiUpdate() {
 
 void RemoteVSTServer::finisherror() {
    cerr << "Failed to load dll!" << endl;
-  
-  int *ptr;
-  ptr = (int *)m_shm;  
-  *ptr = 2001;
-  
+    
   exiting = 1;
   //sleep(1);
 
@@ -2042,27 +2038,32 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
     cerr << "ERROR: Remote VST start error" << endl;
     sched_yield();
     if (remoteVSTServerInstance2[idx]) {
-      remoteVSTServerInstance2[idx]->finisherror();
-      delete remoteVSTServerInstance2[idx];
+    if(remoteVSTServerInstance2[idx]->m_shm)
+    {
+    ptr = (int *)remoteVSTServerInstance2[idx]->m_shm; 
+    *ptr = 2001;
+    }
+    remoteVSTServerInstance2[idx]->finisherror();
+    delete remoteVSTServerInstance2[idx];
     }
     sched_yield();
     remoteVSTServerInstance2[idx] = 0;
     sched_yield();
     if (ThreadHandlevst[idx])
-      CloseHandle(ThreadHandlevst[idx]);
+    CloseHandle(ThreadHandlevst[idx]);
     sched_yield();
     realplugincount--;
     ///      ExitThread(0);
     return 0;
   }
+  
+  ptr = (int *)remoteVSTServerInstance2[idx]->m_shm; 
 
   remoteVSTServerInstance2[idx]->pidx = idx;
 
   int startok;
 
   startok = 0;
-
-  ptr = (int *)remoteVSTServerInstance2[idx]->m_shm;
 
   *ptr = 410;
 
@@ -2081,7 +2082,8 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
 
   if (startok == 0) {
     cerr << "ERROR: Remote VST start error" << endl;
-    sched_yield();
+    sched_yield(); 
+    *ptr = 2001;
     remoteVSTServerInstance2[idx]->finisherror();
     delete remoteVSTServerInstance2[idx];
     sched_yield();
@@ -2123,7 +2125,8 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
 
   if (remoteVSTServerInstance2[idx]->plugerr == 1) {
     cerr << "Load Error" << endl;
-    sched_yield();
+    sched_yield(); 
+    *ptr = 2001;
     remoteVSTServerInstance2[idx]->finisherror();
     delete remoteVSTServerInstance2[idx];
     sched_yield();
@@ -2147,7 +2150,8 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
       (!remoteVSTServerInstance2[idx]->ThreadHandle[2]) ||
       (!remoteVSTServerInstance2[idx]->ThreadHandle[3])) {
     cerr << "Load Error" << endl;
-    sched_yield();
+    sched_yield(); 
+    *ptr = 2001;
     remoteVSTServerInstance2[idx]->finisherror();
     delete remoteVSTServerInstance2[idx];
     sched_yield();
