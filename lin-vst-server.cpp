@@ -2722,7 +2722,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                 SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent7);
                 break;
               }
-
+/*
               if (!(remoteVSTServerInstance2[pidx]->m_plugin->flags &
                     effFlagsCanReplacing)) {
                 cerr << "dssi-vst-server: ERROR: Not a VST plugin in DLL \""
@@ -2733,7 +2733,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                 SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent7);
                 break;
               }
-
+*/
               remoteVSTServerInstance2[pidx]->m_plugin->resvd2 =
                   (RemoteVSTServer *)remoteVSTServerInstance2[pidx];
               hcidx = 512000;
