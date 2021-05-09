@@ -1801,7 +1801,7 @@ void RemotePluginClient::ServerConnect(Dl_info info) {
   //    signal(SIGCHLD, SIG_IGN);
 
   if (doexec) {
-    if ((child = fork()) < 0) {
+    if ((child = vfork()) < 0) {
       m_runok = 1;
       cleanup();
       return;
