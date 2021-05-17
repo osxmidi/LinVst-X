@@ -55,6 +55,9 @@ RemotePluginServer::RemotePluginServer(std::string fileIdentifiers)
       hosttracktion(0),
 #endif
 #endif
+#ifdef PCACHE
+     m_shm5(0),
+#endif    
       m_threadsfinish(0), m_386run(0), starterror(0) {
   char tmpFileBase[60];
   int startok;
@@ -189,7 +192,11 @@ int RemotePluginServer::sizeShm() {
 
   int *ptr;
 
+#ifdef PCACHE
+  size_t sz = PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX + CHUNKSIZEMAX + SHMVALX + VSTEVENTS_SEND + SHMVALX + (sizeof(ShmControl) * 6) + SHMVALX + PARCACHE  + SHMVALX;
+#else
   size_t sz = PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX + CHUNKSIZEMAX + SHMVALX + VSTEVENTS_SEND + SHMVALX + (sizeof(ShmControl) * 6) + SHMVALX;
+#endif  
 
   m_shm = (char *)mmap(0, sz, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE,
                        m_shmFd, 0);
@@ -212,6 +219,10 @@ int RemotePluginServer::sizeShm() {
   m_shm2 = &m_shm[PROCESSSIZE + SHMVALX];
   m_shm3 = &m_shm[PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX];
   m_shm4 = &m_shm[PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX + CHUNKSIZEMAX + SHMVALX + VSTEVENTS_SEND + SHMVALX];
+
+#ifdef PCACHE
+  m_shm5 = &m_shm[PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX + CHUNKSIZEMAX + SHMVALX + VSTEVENTS_SEND + SHMVALX + (sizeof(ShmControl) * 6) + SHMVALX];
+#endif
 
   return 0;
 }

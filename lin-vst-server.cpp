@@ -128,7 +128,29 @@ public:
   }
   virtual int getParameterCount() {
     if (m_plugin)
+    {
+#ifdef PCACHE
+      int val = m_plugin->numParams;
+      
+      numpars = val;
+      
+      ParamState p;
+  
+      for (int i = 0; i < val; ++i)
+      {
+      if(i >= 10000)
+      break;
+      p.changed = 0;   
+      float value = getParameter(i);      
+      p.value = value;       
+      memcpy(&m_shm5[i * sizeof(ParamState)], &p, sizeof(ParamState));      
+      }   
+       
+      return val;                   
+#else        
       return m_plugin->numParams;
+#endif      
+    }  
   }
   virtual std::string getParameterName(int);
   virtual std::string getParameterLabel(int);
@@ -251,9 +273,46 @@ public:
   static DWORD WINAPI GetSetThreadMain(void *parameter) {
     RemoteVSTServer *remote2 = (RemoteVSTServer *)parameter;
 
+#ifdef PCACHE  
+  struct sched_param param;
+  param.sched_priority = 0;
+  int result = sched_setscheduler(0, SCHED_OTHER, &param);
+
+  if (result < 0)
+  {
+  perror("Failed to set realtime priority for audio thread");
+  }
+ 
+  struct ParamState {
+  float value;
+  int changed;
+  };
+   
+   ParamState *pstate = (ParamState*)remote2->m_shm5; 
+   
+   while (!remote2->exiting) {
+   sched_yield();
+     
+   if(remote2->numpars > 0)
+   {
+   for(int idx=0;idx<remote2->numpars;idx++)
+   {
+   if(pstate[idx].changed == 1)
+   {
+   remote2->setParameter(idx, pstate[idx].value);
+   pstate[idx].changed = 0; 
+   break;  
+   }    
+   sched_yield();
+   } 
+   }            
+  }  
+#else  
     while (!remote2->exiting) {
       remote2->dispatchGetSet(5);
     }
+#endif
+    
     // param.sched_priority = 0;
     // (void)sched_setscheduler(0, SCHED_OTHER, &param);
     remote2->getfin = 1;
@@ -358,6 +417,10 @@ public:
   int getfin;
   int confin;  
   int hidegui;
+  
+#ifdef PCACHE
+  int numpars;
+#endif    
 
   std::string deviceName2;
   std::string bufferwaves;
@@ -431,7 +494,12 @@ RemoteVSTServer::RemoteVSTServer(std::string fileIdentifiers,
       guiresizeheight(200), melda(0), winm(0), hWnd(0), hidegui(0),
       ghWriteEvent(0), ghWriteEvent2(0), ghWriteEvent3(0), ghWriteEvent4(0),
       ghWriteEvent5(0), ghWriteEvent6(0), ghWriteEvent7(0), libHandle(0), m_plugin(0), pidx(0),
-      plugerr(0), debugLevel(RemotePluginDebugNone) {
+      plugerr(0), 
+#ifdef PCACHE
+      numpars(0),
+#endif            
+      debugLevel(RemotePluginDebugNone)            
+       {
   ThreadHandle[0] = 0;
   ThreadHandle[1] = 0;
   ThreadHandle[2] = 0;
@@ -1267,6 +1335,21 @@ int RemoteVSTServer::processVstEvents() {
 }
 
 void RemoteVSTServer::getChunk(ShmControl *m_shmControlptr) {
+#ifdef PCACHE
+    ParamState *pstate = (ParamState*)m_shm5; 
+       
+    if(numpars > 0)
+    {
+    for(int idx=0;idx<numpars;idx++)
+    {
+    sched_yield();
+    while(pstate[idx].changed == 1)
+    {
+     sched_yield();
+    } 
+    } 
+    }           
+#endif
 #ifdef CHUNKBUF
   int bnk_prg = m_shmControlptr->value;
   int sz =
@@ -1293,6 +1376,21 @@ void RemoteVSTServer::getChunk(ShmControl *m_shmControlptr) {
 }
 
 void RemoteVSTServer::setChunk(ShmControl *m_shmControlptr) {
+#ifdef PCACHE
+    ParamState *pstate = (ParamState*)m_shm5;    
+       
+    if(numpars > 0)
+    {
+    for(int idx=0;idx<numpars;idx++)
+    {
+    sched_yield();
+    while(pstate[idx].changed == 1)
+    {
+     sched_yield();
+    } 
+    } 
+    }           
+#endif
 #ifdef CHUNKBUF
   int sz = m_shmControlptr->value;
   if (sz >= CHUNKSIZEMAX) {
@@ -1301,12 +1399,14 @@ void RemoteVSTServer::setChunk(ShmControl *m_shmControlptr) {
     int r = m_plugin->dispatcher(m_plugin, effSetChunk, bnk_prg, sz, ptr, 0);
     free(chunkptr2);
     m_shmControlptr->retint = r;
+    getParameterCount();    
     return;
   } else {
     int bnk_prg = m_shmControlptr->value2;
     void *ptr = m_shm3;
     int r = m_plugin->dispatcher(m_plugin, effSetChunk, bnk_prg, sz, ptr, 0);
     m_shmControlptr->retint = r;
+    getParameterCount();    
     return;
   }
 #else
@@ -1315,6 +1415,7 @@ void RemoteVSTServer::setChunk(ShmControl *m_shmControlptr) {
   void *ptr = m_shm3;
   int r = m_plugin->dispatcher(m_plugin, effSetChunk, bnk_prg, sz, ptr, 0);
   m_shmControlptr->retint = r;
+  getParameterCount();    
   return;
 #endif
 }

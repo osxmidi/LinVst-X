@@ -108,12 +108,18 @@ void *RemotePluginClient::AMThread() {
         break;
 
       case audioMasterAutomate:
+      {
         idx = m_shmControlptrth->value;
         optval = m_shmControlptrth->floatvalue;
         retval = 0;
+#ifdef PCACHE
+        ParamState* pstate = (ParamState*)m_shm5;        
+        pstate[idx].value = optval;            
+#endif                
         retval =
             m_audioMaster(theEffect, audioMasterAutomate, idx, 0, 0, optval);
         m_shmControlptrth->retint = retval;
+        }
         break;
 
       case audioMasterGetAutomationState:
@@ -654,6 +660,9 @@ RemotePluginClient::RemotePluginClient(audioMasterCallback theMaster,
 #endif
       eventrun(0), eventfinish(0),
 #endif
+#ifdef PCACHE
+     m_shm5(0),
+#endif    
       theEffect(0) {
   char tmpFileBase[60];
 
@@ -2247,7 +2256,11 @@ int RemotePluginClient::sizeShm() {
   if (m_shm)
     return 0;
 
+#ifdef PCACHE
+  size_t sz = PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX + CHUNKSIZEMAX + SHMVALX + VSTEVENTS_SEND + SHMVALX + (sizeof(ShmControl) * 6) + SHMVALX + PARCACHE  + SHMVALX;
+#else
   size_t sz = PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX + CHUNKSIZEMAX + SHMVALX + VSTEVENTS_SEND + SHMVALX + (sizeof(ShmControl) * 6) + SHMVALX;
+#endif  
 
   ftruncate(m_shmFd, sz);
   m_shm = (char *)mmap(0, sz, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE,
@@ -2270,6 +2283,10 @@ int RemotePluginClient::sizeShm() {
   m_shm2 = &m_shm[PROCESSSIZE + SHMVALX];
   m_shm3 = &m_shm[PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX];
   m_shm4 = &m_shm[PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX + CHUNKSIZEMAX + SHMVALX + VSTEVENTS_SEND + SHMVALX];
+
+#ifdef PCACHE
+  m_shm5 = &m_shm[PROCESSSIZE + SHMVALX + VSTEVENTS_PROCESS + SHMVALX + CHUNKSIZEMAX + SHMVALX + VSTEVENTS_SEND + SHMVALX + (sizeof(ShmControl) * 6) + SHMVALX];
+#endif  
 
   m_threadbreak = 0;
   m_threadbreakexit = 0;
@@ -2426,10 +2443,17 @@ void RemotePluginClient::setParameter(int p, float v) {
     return;
   }
 
+#ifdef PCACHE
+  ParamState* pstate = (ParamState*)m_shm5; 
+    
+  pstate[p].changed = 1;
+  pstate[p].value = v;  
+#else
   m_shmControlptr4->ropcode = RemotePluginSetParameter;
   m_shmControlptr4->value = p;
   m_shmControlptr4->floatvalue = v;
   waitForServer(m_shmControlptr4);
+#endif  
 }
 
 float RemotePluginClient::getParameter(int p) {
@@ -2442,11 +2466,16 @@ float RemotePluginClient::getParameter(int p) {
     return 0;
   }
 
+#ifdef PCACHE
+  ParamState* pstate = (ParamState*)m_shm5;        
+  return pstate[p].value;
+#else
   m_shmControlptr5->ropcode = RemotePluginGetParameter;
   m_shmControlptr5->value = p;
   waitForServer(m_shmControlptr5);
   retval = m_shmControlptr5->retfloat;
   return retval;
+#endif  
 }
 
 float RemotePluginClient::getParameterDefault(int p) { return 0.0; }
