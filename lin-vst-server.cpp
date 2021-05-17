@@ -2456,15 +2456,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
   cerr << "Copyright (c) 2004-2006 Chris Cannam" << endl;
 #ifdef EMBED
 #ifdef VST32SERVER
-  cerr << "LinVst-X version 4.2-32bit" << endl;
+  cerr << "LinVst-X version 4.5-32bit" << endl;
 #else
-  cerr << "LinVst-X version 4.2-64bit" << endl;
+  cerr << "LinVst-X version 4.5-64bit" << endl;
 #endif
 #else
 #ifdef VST32SERVER
-  cerr << "LinVst-X version 4.2st-32bit" << endl;
+  cerr << "LinVst-X version 4.5st-32bit" << endl;
 #else
-  cerr << "LinVst-X version 4.2st-64bit" << endl;
+  cerr << "LinVst-X version 4.5st-64bit" << endl;
 #endif
 #endif
 
