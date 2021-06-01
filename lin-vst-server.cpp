@@ -2614,6 +2614,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                   remoteVSTServerInstance2[pidx]->m_plugin, effEditGetRect, 0,
                   0, &remoteVSTServerInstance2[pidx]->rect, 0);
               sched_yield();
+                /*
               remoteVSTServerInstance2[pidx]->m_plugin->dispatcher(
                   remoteVSTServerInstance2[pidx]->m_plugin, effEditOpen, 0, 0,
                   hWndvst[pidx], 0);
@@ -2622,6 +2623,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                   remoteVSTServerInstance2[pidx]->m_plugin, effEditGetRect, 0,
                   0, &remoteVSTServerInstance2[pidx]->rect, 0);
               sched_yield();
+              */
 
               if (!remoteVSTServerInstance2[pidx]->rect) {
                 cerr << "RectErr\n" << endl;
@@ -2705,6 +2707,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
               sched_yield();
               // ShowWindow(hWnd, SW_SHOW);
               UpdateWindow(hWndvst[pidx]);
+
+              sched_yield();
+              remoteVSTServerInstance2[pidx]->m_plugin->dispatcher(
+                  remoteVSTServerInstance2[pidx]->m_plugin, effEditOpen, 0, 0,
+                  hWndvst[pidx], 0);                
+     
               sched_yield();
               SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent3);
             }
