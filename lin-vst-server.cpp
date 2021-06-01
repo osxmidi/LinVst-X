@@ -2659,10 +2659,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
   				 remoteVSTServerInstance2[pidx]->guiresizewidth = remoteVSTServerInstance2[pidx]->rect->right - remoteVSTServerInstance2[pidx]->rect->left;
  				 remoteVSTServerInstance2[pidx]->guiresizeheight = remoteVSTServerInstance2[pidx]->rect->bottom - remoteVSTServerInstance2[pidx]->rect->top;              
               
-
-                 timerval[pidx] = 6788888 + pidx;
-                 timerval[pidx] = SetTimer(hWndvst[pidx], timerval[pidx], 80, 0);
-
                  sched_yield();
                  SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent);
             }
@@ -2711,7 +2707,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
               sched_yield();
               remoteVSTServerInstance2[pidx]->m_plugin->dispatcher(
                   remoteVSTServerInstance2[pidx]->m_plugin, effEditOpen, 0, 0,
-                  hWndvst[pidx], 0);                
+                  hWndvst[pidx], 0); 
+                
+                 sched_yield();
+                 timerval[pidx] = 6788888 + pidx;
+                 timerval[pidx] = SetTimer(hWndvst[pidx], timerval[pidx], 80, 0);                
      
               sched_yield();
               SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent3);
