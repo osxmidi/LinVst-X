@@ -2698,18 +2698,18 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
             sched_yield();
             int pidx = (int)msg.wParam;
               
-            sched_yield();
-            remoteVSTServerInstance2[pidx]->m_plugin->dispatcher(remoteVSTServerInstance2[pidx]->m_plugin, effEditOpen, 0, 0, hWndvst[pidx], 0);               
-
             if (remoteVSTServerInstance2[pidx]) {
+              sched_yield();
+              remoteVSTServerInstance2[pidx]->m_plugin->dispatcher(remoteVSTServerInstance2[pidx]->m_plugin, effEditOpen, 0, 0, hWndvst[pidx], 0);               
+                
               ShowWindow(hWndvst[pidx], SW_SHOWNORMAL);
               sched_yield();
               // ShowWindow(hWnd, SW_SHOW);
               UpdateWindow(hWndvst[pidx]);
                 
-                 sched_yield();
-                 timerval[pidx] = 6788888 + pidx;
-                 timerval[pidx] = SetTimer(hWndvst[pidx], timerval[pidx], 80, 0);                
+              sched_yield();
+              timerval[pidx] = 6788888 + pidx;
+              timerval[pidx] = SetTimer(hWndvst[pidx], timerval[pidx], 80, 0);                
      
               sched_yield();
               SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent3);
