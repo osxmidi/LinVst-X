@@ -264,6 +264,7 @@ public:
   int parentok;
 #endif
   int eventrun;
+  int eventstop;
   int eventfinish;
 #endif
 
@@ -281,6 +282,7 @@ public:
 
   struct ParamState {
   float value;
+  float valueupdate;
   int changed;
   };
 #endif

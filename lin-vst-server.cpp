@@ -273,45 +273,9 @@ public:
   static DWORD WINAPI GetSetThreadMain(void *parameter) {
     RemoteVSTServer *remote2 = (RemoteVSTServer *)parameter;
 
-#ifdef PCACHE  
-  struct sched_param param;
-  param.sched_priority = 0;
-  int result = sched_setscheduler(0, SCHED_OTHER, &param);
-
-  if (result < 0)
-  {
-  perror("Failed to set realtime priority for audio thread");
-  }
- 
-  struct ParamState {
-  float value;
-  int changed;
-  };
-   
-   ParamState *pstate = (ParamState*)remote2->m_shm5; 
-   
-   while (!remote2->exiting) {
-   sched_yield();
-     
-   if(remote2->numpars > 0)
-   {
-   for(int idx=0;idx<remote2->numpars;idx++)
-   {
-   if(pstate[idx].changed == 1)
-   {
-   remote2->setParameter(idx, pstate[idx].value);
-   pstate[idx].changed = 0; 
-   break;  
-   }    
-   sched_yield();
-   } 
-   }            
-  }  
-#else  
     while (!remote2->exiting) {
       remote2->dispatchGetSet(5);
     }
-#endif
     
     // param.sched_priority = 0;
     // (void)sched_setscheduler(0, SCHED_OTHER, &param);
@@ -824,6 +788,32 @@ RemoteVSTServer::~RemoteVSTServer() {
 
 void RemoteVSTServer::process(float **inputs, float **outputs,
                               int sampleFrames) {
+#ifdef PCACHE
+/*
+  struct ParamState {
+  float value;
+  float valueupdate;
+  int changed;
+  };
+*/
+   
+   ParamState *pstate = (ParamState*)m_shm5; 
+        
+   if(numpars > 0)
+   {
+   for(int idx=0;idx<numpars;idx++)
+   {
+   //sched_yield();
+   if(pstate[idx].changed == 1)
+   {
+   setParameter(idx, pstate[idx].valueupdate);
+   pstate[idx].value = pstate[idx].valueupdate; 
+   pstate[idx].changed = 0; 
+   }    
+   } 
+   }            
+#endif
+
   inProcessThread = true;
   m_plugin->processReplacing(m_plugin, inputs, outputs, sampleFrames);
   inProcessThread = false;
@@ -832,6 +822,32 @@ void RemoteVSTServer::process(float **inputs, float **outputs,
 #ifdef DOUBLEP
 void RemoteVSTServer::processdouble(double **inputs, double **outputs,
                                     int sampleFrames) {
+#ifdef PCACHE
+/*
+  struct ParamState {
+  float value;
+  float valueupdate;
+  int changed;
+  };
+*/
+   
+   ParamState *pstate = (ParamState*)m_shm5; 
+        
+   if(numpars > 0)
+   {
+   for(int idx=0;idx<numpars;idx++)
+   {
+   //sched_yield();
+   if(pstate[idx].changed == 1)
+   {
+   setParameter(idx, pstate[idx].valueupdate);
+   pstate[idx].value = pstate[idx].valueupdate; 
+   pstate[idx].changed = 0; 
+   }    
+   } 
+   }            
+#endif
+
   inProcessThread = true;
   m_plugin->processDoubleReplacing(m_plugin, inputs, outputs, sampleFrames);
   inProcessThread = false;
@@ -1399,14 +1415,18 @@ void RemoteVSTServer::setChunk(ShmControl *m_shmControlptr) {
     int r = m_plugin->dispatcher(m_plugin, effSetChunk, bnk_prg, sz, ptr, 0);
     free(chunkptr2);
     m_shmControlptr->retint = r;
-    getParameterCount();    
+#ifdef PCACHE 
+    getParameterCount();   
+#endif 
     return;
   } else {
     int bnk_prg = m_shmControlptr->value2;
     void *ptr = m_shm3;
     int r = m_plugin->dispatcher(m_plugin, effSetChunk, bnk_prg, sz, ptr, 0);
     m_shmControlptr->retint = r;
-    getParameterCount();    
+#ifdef PCACHE 
+    getParameterCount();  
+#endif  
     return;
   }
 #else
@@ -1415,7 +1435,9 @@ void RemoteVSTServer::setChunk(ShmControl *m_shmControlptr) {
   void *ptr = m_shm3;
   int r = m_plugin->dispatcher(m_plugin, effSetChunk, bnk_prg, sz, ptr, 0);
   m_shmControlptr->retint = r;
-  getParameterCount();    
+#ifdef PCACHE 
+  getParameterCount(); 
+#endif   
   return;
 #endif
 }
@@ -2063,14 +2085,18 @@ void RemoteVSTServer::finisherror() {
     WaitForSingleObject(ThreadHandle[0], 5000);
     CloseHandle(ThreadHandle[0]);
   }
+#ifndef PCACHE
   if (ThreadHandle[1]) {
     WaitForSingleObject(ThreadHandle[1], 5000);
     CloseHandle(ThreadHandle[1]);
   }
+#endif
+#ifndef PCACHE
   if (ThreadHandle[2]) {
     WaitForSingleObject(ThreadHandle[2], 5000);
     CloseHandle(ThreadHandle[2]);
   }
+#endif
   if (ThreadHandle[3]) {
     WaitForSingleObject(ThreadHandle[3], 5000);
     CloseHandle(ThreadHandle[3]);
@@ -2166,7 +2192,7 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
 
   startok = 0;
 
-  *ptr = 450;
+  *ptr = 451;
 
   for (int i = 0; i < 400000; i++) {
     if ((*ptr == 2) || (*ptr == 3)) {
@@ -2243,12 +2269,18 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   
   remoteVSTServerInstance2[idx]->StartThreadFunc();
   remoteVSTServerInstance2[idx]->StartThreadFunc2();
+#ifndef PCACHE 
   remoteVSTServerInstance2[idx]->StartThreadFunc3();
+#endif
   remoteVSTServerInstance2[idx]->StartThreadFunc4();  
 
   if ((!remoteVSTServerInstance2[idx]->ThreadHandle[0]) ||
+#ifndef PCACHE
       (!remoteVSTServerInstance2[idx]->ThreadHandle[1]) ||
+#endif
+#ifndef PCACHE
       (!remoteVSTServerInstance2[idx]->ThreadHandle[2]) ||
+#endif
       (!remoteVSTServerInstance2[idx]->ThreadHandle[3])) {
     cerr << "Load Error" << endl;
     sched_yield(); 
@@ -2338,8 +2370,12 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   sched_yield();
 
   ResumeThread(remoteVSTServerInstance2[idx]->ThreadHandle[0]);
+#ifndef PCACHE
   ResumeThread(remoteVSTServerInstance2[idx]->ThreadHandle[1]);
+#endif
+#ifndef PCACHE
   ResumeThread(remoteVSTServerInstance2[idx]->ThreadHandle[2]);
+#endif
   ResumeThread(remoteVSTServerInstance2[idx]->ThreadHandle[3]);  
 
   sched_yield();
@@ -2374,9 +2410,14 @@ break;
   //MsgWaitForMultipleObjects(4, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000, QS_ALLEVENTS);
 
   for (int idx50 = 0; idx50 < 100000; idx50++) {
-    if (remoteVSTServerInstance2[idx]->parfin &&
+    if (
+#ifndef PCACHE
+remoteVSTServerInstance2[idx]->parfin &&
+#endif
         remoteVSTServerInstance2[idx]->audfin &&
+#ifndef PCACHE
         remoteVSTServerInstance2[idx]->getfin &&
+#endif
         remoteVSTServerInstance2[idx]->confin)
       break;
     usleep(100);
@@ -2389,15 +2430,18 @@ break;
     
   sched_yield();    
 
+#ifndef PCACHE
   if (remoteVSTServerInstance2[idx]->ThreadHandle[1])
     CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[1]);
     
   sched_yield();    
-
+#endif
+#ifndef PCACHE
   if (remoteVSTServerInstance2[idx]->ThreadHandle[2])
     CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[2]);
     
   sched_yield();    
+#endif
     
   if (remoteVSTServerInstance2[idx]->ThreadHandle[3])
     CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[3]);    
@@ -2456,15 +2500,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
   cerr << "Copyright (c) 2004-2006 Chris Cannam" << endl;
 #ifdef EMBED
 #ifdef VST32SERVER
-  cerr << "LinVst-X version 4.5-32bit" << endl;
+  cerr << "LinVst-X version 4.5.1-32bit" << endl;
 #else
-  cerr << "LinVst-X version 4.5-64bit" << endl;
+  cerr << "LinVst-X version 4.5.1-64bit" << endl;
 #endif
 #else
 #ifdef VST32SERVER
-  cerr << "LinVst-X version 4.5st-32bit" << endl;
+  cerr << "LinVst-X version 4.5.1st-32bit" << endl;
 #else
-  cerr << "LinVst-X version 4.5st-64bit" << endl;
+  cerr << "LinVst-X version 4.5.1st-64bit" << endl;
 #endif
 #endif
 
