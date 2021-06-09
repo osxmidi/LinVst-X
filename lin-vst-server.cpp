@@ -2651,6 +2651,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                 SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent);
                 break;
               }
+                
+              SetWindowPos(hWndvst[pidx], HWND_TOP,
+              GetSystemMetrics(SM_XVIRTUALSCREEN) + remoteVSTServerInstance2[pidx]->offset.x,
+              GetSystemMetrics(SM_YVIRTUALSCREEN) + remoteVSTServerInstance2[pidx]->offset.y, 200, 200, 0);                
 
               sched_yield();
               remoteVSTServerInstance2[pidx]->rect = 0;
@@ -2658,7 +2662,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                   remoteVSTServerInstance2[pidx]->m_plugin, effEditGetRect, 0,
                   0, &remoteVSTServerInstance2[pidx]->rect, 0);
               sched_yield();
-                /*
               remoteVSTServerInstance2[pidx]->m_plugin->dispatcher(
                   remoteVSTServerInstance2[pidx]->m_plugin, effEditOpen, 0, 0,
                   hWndvst[pidx], 0);
@@ -2667,7 +2670,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                   remoteVSTServerInstance2[pidx]->m_plugin, effEditGetRect, 0,
                   0, &remoteVSTServerInstance2[pidx]->rect, 0);
               sched_yield();
-              */
 
               if (!remoteVSTServerInstance2[pidx]->rect) {
                 cerr << "RectErr\n" << endl;
@@ -2682,7 +2684,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
  				 SetWindowPos(hWndvst[pidx], HWND_TOP,
                  GetSystemMetrics(SM_XVIRTUALSCREEN) + remoteVSTServerInstance2[pidx]->offset.x,
                  GetSystemMetrics(SM_YVIRTUALSCREEN) + remoteVSTServerInstance2[pidx]->offset.y,
-                 remoteVSTServerInstance2[pidx]->rect->right - remoteVSTServerInstance2[pidx]->rect->left, remoteVSTServerInstance2[pidx]->rect->bottom - 			remoteVSTServerInstance2[pidx]->rect->top, 0);
+                 remoteVSTServerInstance2[pidx]->rect->right - remoteVSTServerInstance2[pidx]->rect->left, remoteVSTServerInstance2[pidx]->rect->bottom - remoteVSTServerInstance2[pidx]->rect->top, 0);
  			 } else {
   				 SetWindowPos(hWndvst[pidx], HWND_TOP, GetSystemMetrics(SM_XVIRTUALSCREEN),
                  GetSystemMetrics(SM_YVIRTUALSCREEN), remoteVSTServerInstance2[pidx]->rect->right - remoteVSTServerInstance2[pidx]->rect->left,
@@ -2743,9 +2745,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
             int pidx = (int)msg.wParam;
               
             if (remoteVSTServerInstance2[pidx]) {
-              sched_yield();
-              remoteVSTServerInstance2[pidx]->m_plugin->dispatcher(remoteVSTServerInstance2[pidx]->m_plugin, effEditOpen, 0, 0, hWndvst[pidx], 0);               
-                
+              sched_yield();                            
               ShowWindow(hWndvst[pidx], SW_SHOWNORMAL);
               sched_yield();
               // ShowWindow(hWnd, SW_SHOW);
