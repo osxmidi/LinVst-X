@@ -1351,21 +1351,6 @@ int RemoteVSTServer::processVstEvents() {
 }
 
 void RemoteVSTServer::getChunk(ShmControl *m_shmControlptr) {
-#ifdef PCACHE
-    ParamState *pstate = (ParamState*)m_shm5; 
-       
-    if(numpars > 0)
-    {
-    for(int idx=0;idx<numpars;idx++)
-    {
-    sched_yield();
-    while(pstate[idx].changed == 1)
-    {
-     sched_yield();
-    } 
-    } 
-    }           
-#endif
 #ifdef CHUNKBUF
   int bnk_prg = m_shmControlptr->value;
   int sz =
@@ -1392,21 +1377,6 @@ void RemoteVSTServer::getChunk(ShmControl *m_shmControlptr) {
 }
 
 void RemoteVSTServer::setChunk(ShmControl *m_shmControlptr) {
-#ifdef PCACHE
-    ParamState *pstate = (ParamState*)m_shm5;    
-       
-    if(numpars > 0)
-    {
-    for(int idx=0;idx<numpars;idx++)
-    {
-    sched_yield();
-    while(pstate[idx].changed == 1)
-    {
-     sched_yield();
-    } 
-    } 
-    }           
-#endif
 #ifdef CHUNKBUF
   int sz = m_shmControlptr->value;
   if (sz >= CHUNKSIZEMAX) {
