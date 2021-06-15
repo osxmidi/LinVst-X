@@ -771,7 +771,7 @@ void RemotePluginClient::eventloop(Display *display, Window parent,
   plugin->eventstop = 1;
 
   if (parent && child) {
-    for (int loopidx = 0; (loopidx < 10) && XPending(display); loopidx++) {
+    for (int loopidx = 0; (loopidx < 100) && XPending(display); loopidx++) {
       XEvent e;
 
       XNextEvent(display, &e);
@@ -1025,7 +1025,7 @@ VstIntPtr RemotePluginClient::dispatchproc(AEffect *effect, VstInt32 opcode,
 
   case effEditIdle:
 #ifdef EMBED
-    if (plugin->eventrun == 1) {
+    if (plugin->eventrun > 0) {
 #ifdef EMBEDDRAG
       plugin->eventloop(plugin->display, plugin->pparent, plugin->parent,
                         plugin->child, plugin->width, plugin->height,
@@ -1035,6 +1035,11 @@ VstIntPtr RemotePluginClient::dispatchproc(AEffect *effect, VstInt32 opcode,
                         plugin->width, plugin->height, plugin->reaperid,
                         plugin);
 #endif
+      if(plugin->eventrun == 1)
+      {
+      plugin->openGUI();
+      plugin->eventrun = 2;    
+      }
     }
 #endif
     break;
@@ -1190,7 +1195,7 @@ VstIntPtr RemotePluginClient::dispatchproc(AEffect *effect, VstInt32 opcode,
     plugin->display = XOpenDisplay(0);
 
     if (plugin->display && plugin->handle && !plugin->winm->winerror) {
-      plugin->eventrun = 1;
+      // plugin->eventrun = 1;
       // XLockDisplay(plugin->display);
       plugin->editopen = 1;
 
@@ -1275,8 +1280,9 @@ VstIntPtr RemotePluginClient::dispatchproc(AEffect *effect, VstInt32 opcode,
       XMapWindow(plugin->display, plugin->child);
       XSync(plugin->display, false);
 
-      plugin->openGUI();
+      // plugin->openGUI();
       plugin->displayerr = 0;
+      plugin->eventrun = 1;
       // XUnlockDisplay(plugin->display);
     } else {
       plugin->displayerr = 1;
@@ -2101,7 +2107,7 @@ void RemotePluginClient::syncStartup() {
   ptr = (int *)m_shm;
 
   for (int i = 0; i < 400000; i++) {
-    if (*ptr == 451) {
+    if (*ptr == 452) {
       startok = 1;
       break;
     }
@@ -2462,9 +2468,12 @@ void RemotePluginClient::setParameter(int p, float v) {
   ParamState* pstate = (ParamState*)m_shm5; 
 
   if(p < 10000)
-  {    
+  { 
+  if(pstate[p].value != v)
+  {      
   pstate[p].changed = 1;
-  pstate[p].valueupdate = v;  
+  pstate[p].valueupdate = v; 
+  } 
   }
 #else
   m_shmControlptr4->ropcode = RemotePluginSetParameter;
