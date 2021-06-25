@@ -771,7 +771,7 @@ void RemotePluginClient::eventloop(Display *display, Window parent,
   plugin->eventstop = 1;
 
   if (parent && child) {
-    for (int loopidx = 0; (loopidx < 100) && XPending(display); loopidx++) {
+    for (int loopidx = 0; (loopidx < 5) && XPending(display); loopidx++) {
       XEvent e;
 
       XNextEvent(display, &e);
@@ -1513,11 +1513,12 @@ VstIntPtr RemotePluginClient::dispatchproc(AEffect *effect, VstInt32 opcode,
 
     plugin->effVoidOp(effClose);
 
-    /*
-    #ifndef BITWIG
-            wait(NULL);
-    #endif
-    */
+//#ifndef BITWIG
+//    wait(NULL);
+    int wstatus;
+    waitpid(-1, &wstatus, WUNTRACED);
+//#endif
+		  
     delete plugin;
     break;
 
