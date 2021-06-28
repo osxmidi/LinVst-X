@@ -636,7 +636,7 @@ void RemoteVSTServer::EffectOpen(ShmControl *m_shmControlptr) {
   CloseHandle(ghWriteEvent4);
   sched_yield();
 
-  //    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
+  m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
 
   m_plugin->dispatcher(m_plugin, effSetBlockSize, 0, bufferSize, NULL, 0);
   m_plugin->dispatcher(m_plugin, effSetSampleRate, 0, 0, NULL,
@@ -746,7 +746,7 @@ void RemoteVSTServer::EffectOpen(ShmControl *m_shmControlptr) {
     waitForServer(m_shmControl);
   }
 
-  // m_plugin->dispatcher(m_plugin, effMainsChanged, 0, 1, NULL, 0);
+  m_plugin->dispatcher(m_plugin, effMainsChanged, 0, 1, NULL, 0);
 
   effectrun = true;
 }
@@ -1053,9 +1053,9 @@ std::string RemoteVSTServer::getEffString(int opcode, int index) {
 
 void RemoteVSTServer::setBufferSize(int sz) {
   if (bufferSize != sz) {
-    //    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
+    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
     m_plugin->dispatcher(m_plugin, effSetBlockSize, 0, sz, NULL, 0);
-    //   m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0);
+    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0);
     bufferSize = sz;
   }
 
@@ -1065,9 +1065,9 @@ void RemoteVSTServer::setBufferSize(int sz) {
 
 void RemoteVSTServer::setSampleRate(int sr) {
   if (sampleRate != sr) {
-    //    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
+    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
     m_plugin->dispatcher(m_plugin, effSetSampleRate, 0, 0, NULL, (float)sr);
-    //    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0);
+    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0);
     sampleRate = sr;
   }
 
