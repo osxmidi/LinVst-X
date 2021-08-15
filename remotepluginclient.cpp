@@ -1515,8 +1515,8 @@ VstIntPtr RemotePluginClient::dispatchproc(AEffect *effect, VstInt32 opcode,
 
 //#ifndef BITWIG
 //    wait(NULL);
-    int wstatus;
-    waitpid(-1, &wstatus, WUNTRACED);
+//    int wstatus;
+ //   waitpid(-1, &wstatus, WUNTRACED);
 //#endif
 		  
     delete plugin;
