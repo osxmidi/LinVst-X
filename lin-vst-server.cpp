@@ -784,33 +784,6 @@ void RemoteVSTServer::EffectOpen(ShmControl *m_shmControlptr) {
 }
 
 RemoteVSTServer::~RemoteVSTServer() {
-  DWORD dwWaitResult;
-    
-  char lpbuf2[512]; 
-  sprintf(lpbuf2, "%d", pidx);  
-  string lpbuf = "create5";
-  lpbuf = lpbuf + lpbuf2;    
-
-  sched_yield();
-  ghWriteEvent5 = 0;
-  ghWriteEvent5 = CreateEvent(NULL, TRUE, FALSE, lpbuf.c_str());
-  while (0 ==
-         PostThreadMessage(mainThreadId, WM_SYNC5, (WPARAM)pidx, (LPARAM)wname))
-    sched_yield();
-  dwWaitResult = WaitForSingleObject(ghWriteEvent5, 20000);
-  CloseHandle(ghWriteEvent5);
-  sched_yield();
-
-  //waitForServerexit();
-
-  waitForClient2exit();
-  waitForClient3exit();
-  waitForClient4exit();
-  waitForClient5exit();
-  waitForClient6exit();
-
-  sched_yield();
-
   /*
   #ifdef EMBED
       if (winm)
@@ -2180,7 +2153,12 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   char lpbuf32[512]; 
   sprintf(lpbuf32, "%d", idx);  
   string lpbuf3 = "create6";
-  lpbuf3 = lpbuf3 + lpbuf32;           
+  lpbuf3 = lpbuf3 + lpbuf32;  
+  
+  char lpbuf42[512]; 
+  sprintf(lpbuf42, "%d", idx);  
+  string lpbuf4 = "create5";
+  lpbuf4 = lpbuf4 + lpbuf42;               
 
   loaderr = 0;
 
@@ -2490,7 +2468,21 @@ remoteVSTServerInstance2[idx]->parfin &&
     CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[3]);    
 
   sched_yield();
-
+  
+  if(remoteVSTServerInstance2[idx]->effectrun == true)
+  {
+  remoteVSTServerInstance2[idx]->ghWriteEvent5 = 0;
+  remoteVSTServerInstance2[idx]->ghWriteEvent5 = CreateEvent(NULL, TRUE, FALSE, lpbuf4.c_str());
+  while (0 ==
+         PostThreadMessage(mainThreadId, WM_SYNC5, (WPARAM)idx,
+                                (LPARAM)libname))
+    sched_yield();
+  dwWaitResult = WaitForSingleObject(remoteVSTServerInstance2[idx]->ghWriteEvent5, 20000);
+  CloseHandle(remoteVSTServerInstance2[idx]->ghWriteEvent5);
+  }
+  
+  sched_yield();  
+  
   if (remoteVSTServerInstance2[idx]) {
     delete remoteVSTServerInstance2[idx];
   }
