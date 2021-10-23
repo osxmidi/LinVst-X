@@ -75,6 +75,8 @@ typedef AEffect *(VSTCALLBACK *VstEntry)(audioMasterCallback audioMaster);
 #define WM_SYNC5 (WM_USER + 5)
 #define WM_SYNC6 (WM_USER + 6)
 #define WM_SYNC7 (WM_USER + 7)
+#define WM_SYNC8 (WM_USER + 8)
+#define WM_SYNC9 (WM_USER + 9)
 
 char libnamesync[4096];
 
@@ -411,6 +413,8 @@ public:
   HANDLE ghWriteEvent5;
   HANDLE ghWriteEvent6;  
   HANDLE ghWriteEvent7;
+  HANDLE ghWriteEvent8;
+  HANDLE ghWriteEvent9;    
 
 public:
   HINSTANCE libHandle;
@@ -458,7 +462,7 @@ RemoteVSTServer::RemoteVSTServer(std::string fileIdentifiers,
       getfin(0), confin(0), guiupdate(0), guiupdatecount(0), guiresizewidth(500),
       guiresizeheight(200), melda(0), winm(0), hWnd(0), hidegui(0),
       ghWriteEvent(0), ghWriteEvent2(0), ghWriteEvent3(0), ghWriteEvent4(0),
-      ghWriteEvent5(0), ghWriteEvent6(0), ghWriteEvent7(0), libHandle(0), m_plugin(0), pidx(0),
+      ghWriteEvent5(0), ghWriteEvent6(0), ghWriteEvent7(0), ghWriteEvent8(0), ghWriteEvent9(0), libHandle(0), m_plugin(0), pidx(0),
       plugerr(0), 
 #ifdef PCACHE
       numpars(0),
@@ -622,6 +626,16 @@ void RemoteVSTServer::EffectOpen(ShmControl *m_shmControlptr) {
   sprintf(lpbuf2, "%d", pidx);  
   string lpbuf = "create4";
   lpbuf = lpbuf + lpbuf2;    
+
+  char lpbuf3[512]; 
+  sprintf(lpbuf3, "%d", pidx);  
+  string lpbuf32 = "create8";
+  lpbuf32 = lpbuf32 + lpbuf3;  
+
+  char lpbuf4[512]; 
+  sprintf(lpbuf4, "%d", pidx);  
+  string lpbuf42 = "create9";
+  lpbuf42 = lpbuf42 + lpbuf4;      
     
   if (debugLevel > 0)
     cerr << "dssi-vst-server[1]: opening plugin" << endl;
@@ -636,7 +650,16 @@ void RemoteVSTServer::EffectOpen(ShmControl *m_shmControlptr) {
   CloseHandle(ghWriteEvent4);
   sched_yield();
 
-  m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
+//  m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
+
+  ghWriteEvent8 = 0;
+  ghWriteEvent8 = CreateEvent(NULL, TRUE, FALSE, lpbuf32.c_str());
+  while (0 ==
+         PostThreadMessage(mainThreadId, WM_SYNC8, (WPARAM)pidx, (LPARAM)wname))
+    sched_yield();
+  dwWaitResult = WaitForSingleObject(ghWriteEvent8, 20000);
+  CloseHandle(ghWriteEvent8);
+  sched_yield();
 
   m_plugin->dispatcher(m_plugin, effSetBlockSize, 0, bufferSize, NULL, 0);
   m_plugin->dispatcher(m_plugin, effSetSampleRate, 0, 0, NULL,
@@ -746,7 +769,16 @@ void RemoteVSTServer::EffectOpen(ShmControl *m_shmControlptr) {
     waitForServer(m_shmControl);
   }
 
-  m_plugin->dispatcher(m_plugin, effMainsChanged, 0, 1, NULL, 0);
+//  m_plugin->dispatcher(m_plugin, effMainsChanged, 0, 1, NULL, 0);
+
+  ghWriteEvent9 = 0;
+  ghWriteEvent9 = CreateEvent(NULL, TRUE, FALSE, lpbuf42.c_str());
+  while (0 ==
+         PostThreadMessage(mainThreadId, WM_SYNC9, (WPARAM)pidx, (LPARAM)wname))
+    sched_yield();
+  dwWaitResult = WaitForSingleObject(ghWriteEvent9, 20000);
+  CloseHandle(ghWriteEvent9);
+  sched_yield();
 
   effectrun = true;
 }
@@ -989,6 +1021,45 @@ bool RemoteVSTServer::getEffCanDo(std::string ptr) {
 #endif
 
 int RemoteVSTServer::getEffInt(int opcode, int value) {
+  DWORD dwWaitResult;
+
+  char lpbuf3[512]; 
+  sprintf(lpbuf3, "%d", pidx);  
+  string lpbuf32 = "create8";
+  lpbuf32 = lpbuf32 + lpbuf3;  
+
+  char lpbuf4[512]; 
+  sprintf(lpbuf4, "%d", pidx);  
+  string lpbuf42 = "create9";
+  lpbuf42 = lpbuf42 + lpbuf4;
+
+if(opcode == effMainsChanged)
+{
+if(value == 0)
+{
+  ghWriteEvent8 = 0;
+  ghWriteEvent8 = CreateEvent(NULL, TRUE, FALSE, lpbuf32.c_str());
+  while (0 ==
+         PostThreadMessage(mainThreadId, WM_SYNC8, (WPARAM)pidx, (LPARAM)wname))
+    sched_yield();
+  dwWaitResult = WaitForSingleObject(ghWriteEvent8, 20000);
+  CloseHandle(ghWriteEvent8);
+  sched_yield();
+}
+else
+{
+  ghWriteEvent9 = 0;
+  ghWriteEvent9 = CreateEvent(NULL, TRUE, FALSE, lpbuf42.c_str());
+  while (0 ==
+         PostThreadMessage(mainThreadId, WM_SYNC9, (WPARAM)pidx, (LPARAM)wname))
+    sched_yield();
+  dwWaitResult = WaitForSingleObject(ghWriteEvent9, 20000);
+  CloseHandle(ghWriteEvent9);
+  sched_yield();
+}
+return 1;
+}
+
   return m_plugin->dispatcher(m_plugin, opcode, 0, value, NULL, 0);
 }
 
@@ -1053,9 +1124,9 @@ std::string RemoteVSTServer::getEffString(int opcode, int index) {
 
 void RemoteVSTServer::setBufferSize(int sz) {
   if (bufferSize != sz) {
-    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
+//    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
     m_plugin->dispatcher(m_plugin, effSetBlockSize, 0, sz, NULL, 0);
-    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0);
+//    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0);
     bufferSize = sz;
   }
 
@@ -1065,9 +1136,9 @@ void RemoteVSTServer::setBufferSize(int sz) {
 
 void RemoteVSTServer::setSampleRate(int sr) {
   if (sampleRate != sr) {
-    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
+//    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 0, NULL, 0);
     m_plugin->dispatcher(m_plugin, effSetSampleRate, 0, 0, NULL, (float)sr);
-    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0);
+//    m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0);
     sampleRate = sr;
   }
 
@@ -2379,6 +2450,7 @@ break;
   // WaitForMultipleObjects(4, remoteVSTServerInstance2[idx]->ThreadHandle,
   // TRUE, 5000);
   //MsgWaitForMultipleObjects(4, remoteVSTServerInstance2[idx]->ThreadHandle, TRUE, 5000, QS_ALLEVENTS);
+  
 
   for (int idx50 = 0; idx50 < 100000; idx50++) {
     if (
@@ -2389,7 +2461,7 @@ remoteVSTServerInstance2[idx]->parfin &&
 #ifndef PCACHE
         remoteVSTServerInstance2[idx]->getfin &&
 #endif
-        remoteVSTServerInstance2[idx]->confin)
+        remoteVSTServerInstance2[idx]->confin && (remoteVSTServerInstance2[idx]->guiVisible == false))
       break;
     usleep(100);
   }
@@ -2864,15 +2936,47 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
             }
            } 
           break;
+          
+          case WM_SYNC8: {
+            sched_yield();
+            int pidx = (int)msg.wParam;
+
+            if (remoteVSTServerInstance2[pidx]) {
+              remoteVSTServerInstance2[pidx]->m_plugin->dispatcher(
+                  remoteVSTServerInstance2[pidx]->m_plugin, effMainsChanged, 0, 0, NULL,
+                  0);
+              sched_yield();
+              SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent8);
+            }
+          } break;
+
+
+          case WM_SYNC9: {
+            sched_yield();
+            int pidx = (int)msg.wParam;
+
+            if (remoteVSTServerInstance2[pidx]) {
+              remoteVSTServerInstance2[pidx]->m_plugin->dispatcher(
+                  remoteVSTServerInstance2[pidx]->m_plugin, effMainsChanged, 0, 1, NULL,
+                  0);
+              sched_yield();
+              SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent9);
+            }
+          } break;
 
           case WM_TIMER: {
             if (msg.wParam >= 6788888) {
               int valt = msg.wParam - 6788888;
 
               if (valt < plugincount)
+              {
+              if(remoteVSTServerInstance2[valt]->guiVisible == true)
+              {
                 remoteVSTServerInstance2[valt]->m_plugin->dispatcher(
                     remoteVSTServerInstance2[valt]->m_plugin, effEditIdle, 0, 0,
                     NULL, 0);
+              }      
+              }      
             }
           } break;
 
