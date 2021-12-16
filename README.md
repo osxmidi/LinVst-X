@@ -12,7 +12,7 @@ Plugins running in one process are not sandboxed, so if one plugin crashes then 
 
 It's best to use plugins that already run with LinVst and/or use TestVst to test how a plugin might run under Wine.
 
-LinVst-X might have some problems running with Bitwig and Tracktion/Waveform due to some incompatibilities.
+
 
 LinVst-X usage is basically the same as LinVst except that the file to be renamed to the vst dll name is linvstx.so (rather than linvst.so for LinVst).
 
