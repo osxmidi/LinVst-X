@@ -130,8 +130,6 @@ Also, see the Tested VST's folder at https://github.com/osxmidi/LinVst/tree/mast
 
 **Renoise**
 
-Choose the sandbox option for plugins.
-
 Sometimes a synth vst might not declare itself as a synth and Renoise might not enable it.
 
 A workaround is to install sqlitebrowser
