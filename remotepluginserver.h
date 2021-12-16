@@ -13,6 +13,10 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#ifdef DRAGWIN 
+#include <objidl.h>
+#include <shellapi.h>
+#endif
 #undef min
 #undef max
 
@@ -235,6 +239,13 @@ public:
   int errorexit;
 
 #ifdef EMBED
+  struct winmessage {
+    intptr_t handle;
+    int width;
+    int height;
+    int winerror;
+  } winm2;
+  winmessage *winm;
 #ifdef TRACKTIONWM
   int hosttracktion;
 #endif

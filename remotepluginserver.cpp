@@ -636,6 +636,7 @@ void RemotePluginServer::dispatchControlEvents(ShmControl *m_shmControlptr) {
 
   switch (opcode) {
   case RemotePluginShowGUI:
+    memcpy(winm, m_shmControl3->wret, sizeof(winmessage));
     showGUI(m_shmControl3);
     break;
 

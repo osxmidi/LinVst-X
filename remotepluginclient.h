@@ -167,17 +167,6 @@ public:
 
   void ServerConnect(Dl_info info);
 
-#ifdef EMBED
-#ifdef EMBEDDRAG
-  void eventloop(Display *display, Window pparent, Window parent, Window child,
-                 int width, int height, int parentok, int reaperid,
-                 RemotePluginClient *plugin);
-#else
-  void eventloop(Display *display, Window parent, Window child, int width,
-                 int height, int reaperid, RemotePluginClient *plugin);
-#endif
-#endif
-
   static VstIntPtr dispatchproc(AEffect *effect, VstInt32 opcode,
                                 VstInt32 index, VstIntPtr value, void *ptr,
                                 float opt);
@@ -237,7 +226,7 @@ public:
   int width;
   int height;
   struct winmessage {
-    int handle;
+    intptr_t handle;
     int width;
     int height;
     int winerror;
@@ -255,13 +244,16 @@ public:
      ((RemotePluginClient*)arg)->EMBEDThread(); } void *EMBEDThread();
   */
 
-#ifdef EMBEDDRAG
-  Window x11_win;
   Window pparent;
+  Window windowreturn;
   Window root;
   Window *children;
   unsigned int numchildren;
   int parentok;
+#ifdef EMBEDDRAG
+  Window x11_win;
+  Window dragwin;
+  int dragwinok;    
 #endif
   int eventrun;
   int eventstop;

@@ -26,12 +26,12 @@ struct vinfo {
   // char a[96];
 };
 
-struct winmessage {
-  int handle;
-  int width;
-  int height;
-  int winerror;
-};
+  struct winmessage {
+    intptr_t handle;
+    int width;
+    int height;
+    int winerror;
+  };
 
 #ifdef VST32
 struct alignas(32) ShmControl
