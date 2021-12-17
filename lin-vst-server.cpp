@@ -1801,9 +1801,11 @@ void RemoteVSTServer::eventloop()
         //     if(mapped2)
         //    {
         if (e.xcrossing.focus == False) { 
+#ifdef DRAGWIN         
         XSetSelectionOwner(display, XdndSelection, 0, CurrentTime); 
         XSetSelectionOwner(display, XdndSelection, drag_win, CurrentTime);
         fidx = pidx;  
+#endif        
           XSetInputFocus(display, child, RevertToPointerRoot, CurrentTime);
           //    XSetInputFocus(display, child, RevertToParent,
           //    e.xcrossing.time);
