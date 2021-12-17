@@ -124,8 +124,6 @@ For details about overriding dll's, see the Wine Config section in the Detailed 
 
 To enable 32 bit vst's on a 64 bit system, a distro's multilib needs to be installed (on Ubuntu it would be sudo apt-get install gcc-multilib g++-multilib)
 
-Drag and Drop is enabled for LinVst-X. 
-
 Also, see the Tested VST's folder at https://github.com/osxmidi/LinVst/tree/master/Tested-VST-Plugins for some vst plugin setups and possible tips.
 
 **Renoise**
