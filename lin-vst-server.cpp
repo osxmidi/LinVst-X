@@ -3541,6 +3541,16 @@ UINT numchars;
 UINT numfiles;
 ULONG numfmt;
 int cfdrop;
+DWORD processID;
+DWORD retprocID;
+
+  retprocID = GetWindowThreadProcessId(hWnd, &processID);
+    
+  if(!retprocID)
+  return;
+    
+  if(processID != GetCurrentProcessId())
+  return;		
 
   if(event == EVENT_OBJECT_CREATE && idObject == OBJID_WINDOW) 
   {
