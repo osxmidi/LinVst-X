@@ -1801,15 +1801,15 @@ void RemoteVSTServer::eventloop()
         //     if(mapped2)
         //    {
         if (e.xcrossing.focus == False) { 
-#ifdef DRAGWIN  
+#ifdef DRAGWIN   
         if(drag_win && display)   
-        {      		
+        {        
         XSetSelectionOwner(display, XdndSelection, 0, CurrentTime); 
         XSetSelectionOwner(display, XdndSelection, drag_win, CurrentTime);
-	}	
-#endif		
-          fidx = pidx;         
-          XSetInputFocus(display, child, RevertToPointerRoot, CurrentTime);
+        }
+#endif        
+        fidx = pidx;          
+        XSetInputFocus(display, child, RevertToPointerRoot, CurrentTime);
           //    XSetInputFocus(display, child, RevertToParent,
           //    e.xcrossing.time);
         }
@@ -2247,16 +2247,6 @@ void RemoteVSTServer::hideGUI() {
   hidegui = 0;
 
   sched_yield();
-  
-#ifdef DRAGWIN  
-  if(drag_win && display)
-  {
-  XDestroyWindow(display, drag_win);
-  drag_win = 0;  
-  }
-#endif  
-
-  sched_yield();  
 }
 
 #ifdef EMBED
@@ -2285,38 +2275,6 @@ void RemoteVSTServer::openGUI() {
 
   guiVisible = true;
   sched_yield();
-  
-#ifdef DRAGWIN  
-  if(display)
-  {
-  attr = {0};  
-  attr.event_mask = NoEventMask;
-
-  drag_win = XCreateWindow(display, DefaultRootWindow(display), 0, 0, 1, 1, 0, 0, InputOutput, CopyFromParent, CWEventMask, &attr);
-
-  if (drag_win) 
-  {
-  int version = 5;
-  XChangeProperty(display, drag_win, XdndAware, XA_ATOM, 32, PropModeReplace, (unsigned char *)&version, 1);
-
-  atomlist = XInternAtom(display, "text/uri-list", False);
-  atomplain = XInternAtom(display, "text/plain", False);
-  atomstring = XInternAtom(display, "audio/midi", False);
- 
- /* 
-  if (!XSetSelectionOwner(display, XdndSelection, drag_win, CurrentTime))
-  {
-  if(drag_win && display)
-  XDestroyWindow(display, drag_win);
-  drag_win = 0;  
-  return;
-  }
-  */
-  }
-  } 
-#endif   
-
-  sched_yield(); 
 }
 #endif
 
@@ -3411,6 +3369,28 @@ else
   
   sched_yield();
   
+#ifdef DRAGWIN  
+  if(remoteVSTServerInstance2[idx]->display)
+  {
+  remoteVSTServerInstance2[idx]->attr = {0};  
+  remoteVSTServerInstance2[idx]->attr.event_mask = NoEventMask;
+
+  remoteVSTServerInstance2[idx]->drag_win = XCreateWindow(remoteVSTServerInstance2[idx]->display, DefaultRootWindow(remoteVSTServerInstance2[idx]->display), 0, 0, 1, 1, 0, 0, InputOutput, CopyFromParent, CWEventMask, &remoteVSTServerInstance2[idx]->attr);
+
+  if(remoteVSTServerInstance2[idx]->drag_win) 
+  {
+  int version = 5;
+  XChangeProperty(remoteVSTServerInstance2[idx]->display, remoteVSTServerInstance2[idx]->drag_win, remoteVSTServerInstance2[idx]->XdndAware, XA_ATOM, 32, PropModeReplace, (unsigned char *)&version, 1);
+
+  remoteVSTServerInstance2[idx]->atomlist = XInternAtom(remoteVSTServerInstance2[idx]->display, "text/uri-list", False);
+  remoteVSTServerInstance2[idx]->atomplain = XInternAtom(remoteVSTServerInstance2[idx]->display, "text/plain", False);
+  remoteVSTServerInstance2[idx]->atomstring = XInternAtom(remoteVSTServerInstance2[idx]->display, "audio/midi", False);
+  }
+  } 
+#endif 
+
+  sched_yield();    
+  
   while (!remoteVSTServerInstance2[idx]->exiting) {
     /*
 if(remoteVSTServerInstance2[idx]->hidegui == 1)
@@ -3478,6 +3458,16 @@ remoteVSTServerInstance2[idx]->parfin &&
     CloseHandle(remoteVSTServerInstance2[idx]->ThreadHandle[3]);    
 
   sched_yield();
+  
+#ifdef DRAGWIN  
+  if(remoteVSTServerInstance2[idx]->drag_win && remoteVSTServerInstance2[idx]->display)
+  {
+  XDestroyWindow(remoteVSTServerInstance2[idx]->display, remoteVSTServerInstance2[idx]->drag_win);
+  remoteVSTServerInstance2[idx]->drag_win = 0;  
+  }
+#endif  
+
+  sched_yield();    
   
   if(remoteVSTServerInstance2[idx]->display)  
   XCloseDisplay(remoteVSTServerInstance2[idx]->display);  
@@ -3547,6 +3537,12 @@ int cfdrop;
 DWORD processID;
 DWORD retprocID;
 
+  if(fidx < 0)
+  return;
+
+  if(remoteVSTServerInstance2[fidx]->guiVisible == false)
+  return;
+
   retprocID = GetWindowThreadProcessId(hWnd, &processID);
     
   if(!retprocID)
@@ -3555,11 +3551,16 @@ DWORD retprocID;
   if(processID != GetCurrentProcessId())
   return;		
 
+/*
   if(event == EVENT_OBJECT_CREATE && idObject == OBJID_WINDOW) 
   {
   if(!IsWindow(FindWindow(NULL , TEXT("TrackerWindow"))))
   return;
   }
+ */
+ 
+  if(!remoteVSTServerInstance2[fidx]->drag_win || !remoteVSTServerInstance2[fidx]->display)
+  return;  
 
  // if(fidx < 0)
  // return;
@@ -3587,10 +3588,10 @@ DWORD retprocID;
   
   cfdrop = 0;
 
-//  if(event == EVENT_OBJECT_CREATE && idObject == OBJID_WINDOW) 
-//  {
-//  if(!IsWindow(FindWindow(NULL , TEXT("TrackerWindow"))))
-//  return;
+  if(event == EVENT_OBJECT_CREATE && idObject == OBJID_WINDOW) 
+  {
+  if(!IsWindow(FindWindow(NULL , TEXT("TrackerWindow"))))
+  return;
   TrackerWindowInfo *trackerInfo = (TrackerWindowInfo*)GetWindowLongPtrA(hWnd, 0);
   if(trackerInfo)
   {
@@ -3701,6 +3702,7 @@ DWORD retprocID;
   if(cfdrop != 0)
   {
   remoteVSTServerInstance2[fidx]->dodragwin = 1;
+  }
   }
   }       
   }
