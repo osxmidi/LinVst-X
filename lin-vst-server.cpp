@@ -287,10 +287,10 @@ public:
     //   ExitThread(0);
     return 0;
   }
-
-  static DWORD WINAPI GetSetThreadMain(void *parameter) {
-    RemoteVSTServer *remote2 = (RemoteVSTServer *)parameter;
-#ifdef DRAGWIN    
+  
+static DWORD WINAPI GetSetThreadMain(LPVOID parameter) {
+RemoteVSTServer *remote2 = (RemoteVSTServer *)parameter;
+#ifdef DRAGWIN  
 POINT point;
 Window groot;
 Window gchild;
@@ -326,7 +326,7 @@ XEvent xdndselect;
   {  
   usleep(1000);
   
-  if(IsWindow(FindWindow(NULL , TEXT("TrackerWindow"))))
+  if(FindWindow(NULL , TEXT("TrackerWindow")))
   remote2->windowok = 1;
   else
   remote2->windowok = 0;
@@ -343,7 +343,6 @@ XEvent xdndselect;
   {
   if(remote2->windowok == 0)
   {
-  remote2->dodragwin = 0;
   continue;
   }
   }
@@ -494,6 +493,18 @@ XEvent xdndselect;
   {
   XFlush(remote2->display); 
   remote2->dodragwin = 0;
+  remote2->pwindow = 0;          		
+  remote2->window = 0;		
+  remote2->xdndversion = -1;				
+  remote2->data = 0;
+  remote2->data2 = 0;			
+  remote2->prevx = -1;
+  remote2->prevy = -1;
+  remote2->dndfinish = 0;
+  remote2->dndaccept = 0;
+  remote2->dropdone = 0;
+  remote2->proxyptr = 0;
+  remote2->winehwnd = 0;  
   }
   else
   {
@@ -561,7 +572,19 @@ XEvent xdndselect;
   XSendEvent(remote2->display, remote2->pwindow, False, NoEventMask, (XEvent*)&xdndclient);
   XFlush(remote2->display); 
 				
-  remote2->dodragwin = 0;                   
+  remote2->dodragwin = 0;   
+  remote2->pwindow = 0;          		
+  remote2->window = 0;		
+  remote2->xdndversion = -1;				
+  remote2->data = 0;
+  remote2->data2 = 0;			
+  remote2->prevx = -1;
+  remote2->prevy = -1;
+  remote2->dndfinish = 0;
+  remote2->dndaccept = 0;
+  remote2->dropdone = 0;
+  remote2->proxyptr = 0;
+  remote2->winehwnd = 0;                  
   }     
   }
   }
@@ -586,30 +609,24 @@ XEvent xdndselect;
   else
   XSendEvent(remote2->display, remote2->pwindow, False, NoEventMask, (XEvent*)&xdndclient);
   XFlush(remote2->display); 
-
-  remote2->dodragwin = 0;
   }
   }   
   }
-  }
-  
+  } 
    usleep(1000);
-  }
- 
+  } 
   #else
      while (!remote2->exiting) {
       remote2->dispatchPar(5);
-    } 
-  
-  #endif
-    
+    }  
+  #endif   
     // param.sched_priority = 0;
     // (void)sched_setscheduler(0, SCHED_OTHER, &param);
     remote2->getfin = 1;
     remote2 = nullptr;
     //    ExitThread(0);
     return 0;
-  }
+}
 
   static DWORD WINAPI ParThreadMain(void *parameter) {
     RemoteVSTServer *remote3 = (RemoteVSTServer *)parameter;
@@ -849,7 +866,7 @@ RemoteVSTServer::RemoteVSTServer(std::string fileIdentifiers,
     : RemotePluginServer(fileIdentifiers), m_name(fallbackName), m_maker(""),
       setprogrammiss(0), hostreaper(0), display(0), child(0), parent(0), pparent(0), parentok(0), reparentdone(0),
 #ifdef DRAGWIN
-dodragwin(0), drag_win(0), pwindow(0), data(0), data2(0), proxyptr(0), prevx(-1), prevy(-1), winehwnd(0),
+dodragwin(0), drag_win(0), pwindow(0), window(0), xdndversion(-1), data(0), data2(0), prevx(-1), prevy(-1), dndfinish(0), dndaccept(0), dropdone(0),  proxyptr(0), winehwnd(0),
 #endif
 #ifdef WAVES
       wavesthread(0),
@@ -3539,9 +3556,9 @@ DWORD retprocID;
 
   if(fidx < 0)
   return;
-
+	
   if(remoteVSTServerInstance2[fidx]->guiVisible == false)
-  return;
+  return;	
 
   retprocID = GetWindowThreadProcessId(hWnd, &processID);
     
@@ -3549,49 +3566,22 @@ DWORD retprocID;
   return;
     
   if(processID != GetCurrentProcessId())
-  return;		
-
-/*
-  if(event == EVENT_OBJECT_CREATE && idObject == OBJID_WINDOW) 
-  {
-  if(!IsWindow(FindWindow(NULL , TEXT("TrackerWindow"))))
-  return;
-  }
- */
- 
+  return;	
+  
   if(!remoteVSTServerInstance2[fidx]->drag_win || !remoteVSTServerInstance2[fidx]->display)
-  return;  
-
- // if(fidx < 0)
- // return;
+  return;
 
   if(remoteVSTServerInstance2[fidx]->dodragwin == 1)
   return;
 
   if(remoteVSTServerInstance2[fidx]->windowok == 1)
   return;
-
-  remoteVSTServerInstance2[fidx]->dodragwin = 0;
-  remoteVSTServerInstance2[fidx]->pwindow = 0;          		
-  remoteVSTServerInstance2[fidx]->window = 0;		
-  remoteVSTServerInstance2[fidx]->xdndversion = -1;				
-  remoteVSTServerInstance2[fidx]->data = 0;
-  remoteVSTServerInstance2[fidx]->data2 = 0;			
-  remoteVSTServerInstance2[fidx]->prevx = -1;
-  remoteVSTServerInstance2[fidx]->prevy = -1;
-  remoteVSTServerInstance2[fidx]->windowok = 0;
-  remoteVSTServerInstance2[fidx]->dndfinish = 0;
-  remoteVSTServerInstance2[fidx]->dndaccept = 0;
-  remoteVSTServerInstance2[fidx]->dropdone = 0;
-  remoteVSTServerInstance2[fidx]->proxyptr = 0;
-  remoteVSTServerInstance2[fidx]->winehwnd = 0;
   
-  cfdrop = 0;
-
   if(event == EVENT_OBJECT_CREATE && idObject == OBJID_WINDOW) 
   {
-  if(!IsWindow(FindWindow(NULL , TEXT("TrackerWindow"))))
+  if(!FindWindow(NULL , TEXT("TrackerWindow")))
   return;
+  cfdrop = 0;
   TrackerWindowInfo *trackerInfo = (TrackerWindowInfo*)GetWindowLongPtrA(hWnd, 0);
   if(trackerInfo)
   {
@@ -3703,11 +3693,9 @@ DWORD retprocID;
   {
   remoteVSTServerInstance2[fidx]->dodragwin = 1;
   }
-  }
   }       
   }
- // }
- // fidx = -1;
+  }
 }
 #endif
 
