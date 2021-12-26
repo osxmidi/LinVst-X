@@ -1,6 +1,6 @@
-# Makefile for linvstconvert
-# linvstconvert is made using the convert directory
-# linvstconvert needs the gtk3 dev libraries installed
+# Makefile for linvstxconvert
+# linvstxconvert is made using the convert directory
+# linvstxconvert needs the gtk3 dev libraries installed
 # to make use make -f Makefile-convert
 # to install to /usr/bin use sudo make -f Makefile-convert install
 # to clean use sudo make -f Makefile-convert clean
@@ -21,22 +21,22 @@ LINK_APP = -no-pie `pkg-config --libs gtk+-3.0` $(LINK_FLAGS)
 
 SRC_DIR=convert
 
-vpath linvstconvertgtk.cpp $(SRC_DIR)
+vpath linvstxconvertgtk.cpp $(SRC_DIR)
 
-TARGETS     = linvstconvert
+TARGETS     = linvstxconvert
 
 # --------------------------------------------------------------
 
 all: $(TARGETS)
 
-linvstconvert: linvstconvertgtk.o
+linvstxconvert: linvstxconvertgtk.o
 	$(CXX) $^ $(LINK_APP) -o $@
 	
-linvstconvertgtk.o: linvstconvertgtk.cpp
+linvstxconvertgtk.o: linvstxconvertgtk.cpp
 	$(CXX) $(BUILD_FLAGS) -c $^ -o $@	
 	
 clean:
 	rm -fR *.o $(TARGETS)
 
 install:
-	install -m 755 linvstconvert $(BIN_DIR)
+	install -m 755 linvstxconvert $(BIN_DIR)
