@@ -18,11 +18,7 @@ LinVst-X usage is basically the same as LinVst except that the file to be rename
 
 LinVst-X binaries are at https://github.com/osxmidi/LinVst-X/releases
 
-The usual X11 and Wine dev packages and multilib are needed (details are in the LinVst Make Guide https://github.com/osxmidi/LinVst/tree/master/Make-Guide) then
-
-make
-
-sudo make install
+See https://github.com/osxmidi/LinVst/tree/master/Make-Guide for setup info and make options
 
 See the convert folder Notes on how to make the linvstx.so renaming conversion utilities.
 
