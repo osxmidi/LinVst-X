@@ -21,7 +21,7 @@ LINK_APP = -no-pie `pkg-config --libs gtk+-3.0` $(LINK_FLAGS)
 
 SRC_DIR=convert
 
-vpath linvstxconvertgtk.cpp $(SRC_DIR)
+vpath linvstconvertgtk.cpp $(SRC_DIR)
 
 TARGETS     = linvstxconvert
 
@@ -29,10 +29,10 @@ TARGETS     = linvstxconvert
 
 all: $(TARGETS)
 
-linvstxconvert: linvstxconvertgtk.o
+linvstxconvert: linvstconvertgtk.o
 	$(CXX) $^ $(LINK_APP) -o $@
 	
-linvstxconvertgtk.o: linvstxconvertgtk.cpp
+linvstconvertgtk.o: linvstconvertgtk.cpp
 	$(CXX) $(BUILD_FLAGS) -c $^ -o $@	
 	
 clean:
