@@ -2691,23 +2691,15 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode,
 
         guiresizewidth = index;
         guiresizeheight = value;
-
-        // ShowWindow(hWnd, SW_HIDE);
-        // SetWindowPos(hWnd, HWND_TOP, 0, 0, guiresizewidth, guiresizeheight,
-        // 0);
-
-/*
-#ifdef TRACKTIONWM
-        if (hosttracktion == 1)
-          SetWindowPos(
-              hWnd, HWND_TOP, GetSystemMetrics(SM_XVIRTUALSCREEN) + offset.x,
-              GetSystemMetrics(SM_YVIRTUALSCREEN) + offset.y, index, value, 0);
-#endif
-*/
+        
+        width = index;
+        height = value;
+          
+        XResizeWindow(display, child, guiresizewidth, guiresizeheight);           
 
         m_shmControlptr->ropcode = (RemotePluginOpcode)opcode;
-        m_shmControlptr->value = index;
-        m_shmControlptr->value2 = value;
+        m_shmControlptr->value = guiresizewidth;
+        m_shmControlptr->value2 = guiresizeheight;
         waitForServer(m_shmControlptr);
         retval = 0;
         retval = m_shmControlptr->retint;
