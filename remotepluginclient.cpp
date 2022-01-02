@@ -1655,6 +1655,8 @@ void RemotePluginClient::syncStartup() {
   winm->winerror = 0;
   winm->width = 0;
   winm->height = 0;
+	
+  rp = &retRect;	
 #endif
 
   if (pthread_create(&m_AMThread, NULL, RemotePluginClient::callAMThread,
