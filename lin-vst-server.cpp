@@ -2981,6 +2981,7 @@ VOID CALLBACK TimerProc(HWND hWnd, UINT message, UINT idTimer, DWORD dwTime) {
 void RemoteVSTServer::guiUpdate() {
 #ifdef EMBED
 #ifdef EMBEDRESIZE
+	/*
   guiupdatecount += 1;
 
   if (guiupdatecount == 2) {
@@ -2989,6 +2990,8 @@ void RemoteVSTServer::guiUpdate() {
     guiupdate = 0;
     guiupdatecount = 0;
   }
+  */
+//    guiupdate = 0;		
 #endif
 #endif
 #ifndef EMBED
