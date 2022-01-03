@@ -1507,6 +1507,10 @@ void RemoteVSTServer::effDoVoid(int opcode) {
     hostreaper = 1;
     return;
   }
+	
+  if (opcode == effStartProcess) {  
+    getParameterCount(); 
+  }	
 
   if (opcode == effClose) {
     waitForServerexit();
