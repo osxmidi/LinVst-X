@@ -2695,7 +2695,9 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode,
         width = index;
         height = value;
           
-        XResizeWindow(display, child, guiresizewidth, guiresizeheight);           
+        XResizeWindow(display, child, guiresizewidth, guiresizeheight);   
+	      
+        eventloop();  	      
 
         m_shmControlptr->ropcode = (RemotePluginOpcode)opcode;
         m_shmControlptr->value = guiresizewidth;
@@ -2704,6 +2706,9 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode,
         retval = 0;
         retval = m_shmControlptr->retint;
         rv = retval;
+	      
+        eventloop();  
+	      
         //   guiupdate = 1;
       }
 #else
