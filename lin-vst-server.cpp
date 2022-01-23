@@ -1741,15 +1741,12 @@ void RemoteVSTServer::eventloop()
  
       windowreturn = parent;
 
-
-/*
       while(XQueryTree(display, windowreturn, &root, &windowreturn, &children, &numchildren))
       {
       if(windowreturn == root)
       break;
       pparent = windowreturn;
       }
- */
       
 #ifdef EMBEDDRAG  
       if (x11_win) {          
@@ -2995,10 +2992,6 @@ VOID CALLBACK TimerProc(HWND hWnd, UINT message, UINT idTimer, DWORD dwTime) {
 
 void RemoteVSTServer::guiUpdate() {
 #ifdef EMBED
-
-printf("guihit %d\n",  pidx);
-
-
   //   if((hostreaper == 1) && (pparent == 0))
   //   {
     
