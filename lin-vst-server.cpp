@@ -772,6 +772,7 @@ XEvent xdndselect;
   
 #ifdef EMBED
   HANDLE handlewin;
+  int reaptimecount;  
 #endif
   int guiupdate;
   int guiupdatecount;
@@ -884,7 +885,7 @@ dodragwin(0), drag_win(0), pwindow(0), window(0), xdndversion(-1), data(0), data
       ghWriteEvent5(0), ghWriteEvent6(0), ghWriteEvent7(0), ghWriteEvent8(0), ghWriteEvent9(0), libHandle(0), m_plugin(0), pidx(0),
       plugerr(0), 
 #ifdef PCACHE
-      numpars(0),
+      numpars(0), reaptimecount(0),
 #endif            
       debugLevel(RemotePluginDebugNone)            
        {
@@ -1740,12 +1741,15 @@ void RemoteVSTServer::eventloop()
  
       windowreturn = parent;
 
+
+/*
       while(XQueryTree(display, windowreturn, &root, &windowreturn, &children, &numchildren))
       {
       if(windowreturn == root)
       break;
       pparent = windowreturn;
       }
+ */
       
 #ifdef EMBEDDRAG  
       if (x11_win) {          
@@ -2066,6 +2070,8 @@ void RemoteVSTServer::showGUI(ShmControl *m_shmControlptr) {
   memcpy(m_shmControlptr->wret, winm, sizeof(winmessage));
   return;
   } 
+  
+  reaptimecount = 0;
   
   // parentok = 0;
   pparent = 0;
@@ -2989,28 +2995,68 @@ VOID CALLBACK TimerProc(HWND hWnd, UINT message, UINT idTimer, DWORD dwTime) {
 
 void RemoteVSTServer::guiUpdate() {
 #ifdef EMBED
-#ifdef EMBEDRESIZE
-	/*
-  guiupdatecount += 1;
 
-  if (guiupdatecount == 2) {
-    ShowWindow(hWndvst[pidx], SW_SHOWNORMAL);
-    UpdateWindow(hWndvst[pidx]);
-    guiupdate = 0;
-    guiupdatecount = 0;
-  }
-  */
-//    guiupdate = 0;		
+printf("guihit %d\n",  pidx);
+
+
+  //   if((hostreaper == 1) && (pparent == 0))
+  //   {
+    
+ //     if(parentok == 0)
+  //    {
+      root = 0;
+      children = 0;
+      numchildren = 0;
+
+      pparent = 0;
+ 
+      windowreturn = parent;
+
+      while(XQueryTree(display, windowreturn, &root, &windowreturn, &children, &numchildren))
+      {
+      if(windowreturn == root)
+      break;
+      pparent = windowreturn;
+      }
+      
+#ifdef EMBEDDRAG  
+      if (x11_win) {          
+      dragwinok = 0;
+
+      if(hostreaper == 1)
+      {
+      if (XQueryTree(display, parent, &root, &dragwin, &children, &numchildren) != 0) {
+      if (children)
+      XFree(children);
+      if ((dragwin != root) && (dragwin != 0))
+      dragwinok = 1;
+      }                    
+      if(dragwinok)
+      {
+      XChangeProperty(display, dragwin, XdndProxy, XA_WINDOW, 32, PropModeReplace, (unsigned char *)&x11_win, 1);
+      XChangeProperty(display, x11_win, XdndProxy, XA_WINDOW, 32, PropModeReplace, (unsigned char *)&x11_win, 1);       
+      }
+      }
+      else
+      {      
+      XChangeProperty(display, parent, XdndProxy, XA_WINDOW, 32, PropModeReplace, (unsigned char *)&x11_win, 1);
+      XChangeProperty(display, x11_win, XdndProxy, XA_WINDOW, 32, PropModeReplace, (unsigned char *)&x11_win, 1);
+      }  
+      }   
 #endif
+      
+#ifdef FOCUS
+      if((pparent != 0) && (pparent != parent))
+      XSelectInput(display, pparent, StructureNotifyMask | SubstructureNotifyMask);
+#else
+      if((pparent != 0) && (pparent != parent))
+      XSelectInput(display, pparent, StructureNotifyMask | SubstructureNotifyMask);
 #endif
-#ifndef EMBED
-  //      SetWindowPos(hWndvst[pidx], 0, 0, 0, guiresizewidth + 6,
-  //      guiresizeheight + 25, SWP_NOMOVE | SWP_HIDEWINDOW);
-  SetWindowPos(hWndvst[pidx], 0, 0, 0, guiresizewidth + 6, guiresizeheight + 25,
-               SWP_NOMOVE);
-  ShowWindow(hWndvst[pidx], SW_SHOWNORMAL);
-  UpdateWindow(hWndvst[pidx]);
-  guiupdate = 0;
+      
+      XSync(display, false);
+  //    }
+   reaptimecount += 1;
+    //  }
 #endif
 }
 
@@ -4223,6 +4269,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
               {
               if(remoteVSTServerInstance2[valt]->guiVisible == true)
               {
+              
+              if((remoteVSTServerInstance2[valt]->hostreaper == 1) && (remoteVSTServerInstance2[valt]->pparent == 0) && (remoteVSTServerInstance2[valt]->reaptimecount < 100))
+              remoteVSTServerInstance2[valt]->guiUpdate();
+                      
                 remoteVSTServerInstance2[valt]->m_plugin->dispatcher(
                     remoteVSTServerInstance2[valt]->m_plugin, effEditIdle, 0, 0,
                     NULL, 0);
