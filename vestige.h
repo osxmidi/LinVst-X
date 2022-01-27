@@ -184,6 +184,8 @@ const int kVstMaxParamStrLen = 24;
 const int kVstProcessPrecision32 = 0;
 const int kVstProcessPrecision64 = 1;
 const int kVstMidiEventIsRealtime = 1;
+const int audioMasterGetInputSpeakerArrangement = 49; // currently unused
+const int audioMasterGetSpeakerArrangement = 31; // deprecated in 2.4?
 
 class VstMidiEvent {
 public:
@@ -341,5 +343,14 @@ public:
   short bottom;
   short right;
 };
+
+#ifdef MIDIEFF
+class VstSpeakerArrangement {
+public:
+    int val;
+    int val2;
+    char data[8][112];
+};
+#endif
 
 #endif
