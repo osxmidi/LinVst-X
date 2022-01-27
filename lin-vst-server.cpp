@@ -2874,6 +2874,30 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode,
       rv = bufferSize;
     }
     break;
+		  
+#ifdef MIDIEFF
+   case audioMasterGetInputSpeakerArrangement:
+        if(!exiting && effectrun)
+        {
+        m_shmControlptr->ropcode = (RemotePluginOpcode)opcode;
+        waitForServer(m_shmControlptr);
+        retval = 0;
+        retval = m_shmControlptr->retint;
+        rv = retval;
+        }
+        break;
+
+   case audioMasterGetSpeakerArrangement:
+        if(!exiting && effectrun)
+        {
+        m_shmControlptr->ropcode = (RemotePluginOpcode)opcode;
+        waitForServer(m_shmControlptr);
+        retval = 0;
+        retval = m_shmControlptr->retint;
+        rv = retval;
+        }
+        break;
+#endif		  
 
   case audioMasterGetInputLatency:
     if (debugLevel > 1)
