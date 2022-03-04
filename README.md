@@ -2,7 +2,7 @@
 
 LinVst-X (the X stands for Extra) adds support for Windows vst plugins to be used in Linux vst capable DAW's.
 
-See LinVst3-X https://github.com/osxmidi/LinVst3 for running vst3 plugins.
+LinVst-X can coexist with LinVst, but it's best to move or copy the plugin dlls to a separate folder (which should be possible for most vst plugins) and then use linvstxconvert on the vst dlls in the folder and then set that folder as a vst search path in the Daw.
 
 LinVst-X runs vst plugins in a single Wine process so plugins that communicate with each other or plugins that can use shared samples between instances will be able to communicate with their other instances.
 
