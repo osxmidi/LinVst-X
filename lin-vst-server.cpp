@@ -2445,6 +2445,10 @@ VstIntPtr RemoteVSTServer::hostCallback2(AEffect *plugin, VstInt32 opcode,
   case audioMasterAutomate:
     //     plugin->setParameter(plugin, index, opt);
     if (!exiting && effectrun) {
+#ifdef PCACHE	
+	if(index >= 10000)
+	break;	
+#endif	      	    
       m_shmControlptr->ropcode = (RemotePluginOpcode)opcode;
       m_shmControlptr->value = index;
       m_shmControlptr->floatvalue = opt;
