@@ -14,6 +14,8 @@ It's best to use plugins that already run with LinVst and/or use TestVst to test
 
 For Waveform, disable sandbox option for plugins.
 
+LinVst-X is also probably the version to use for Daw Automation.
+
 LinVst-X usage is basically the same as LinVst except that the file to be renamed to the vst dll name is linvstx.so (rather than linvst.so for LinVst).
 
 LinVst-X binaries are at https://github.com/osxmidi/LinVst-X/releases
