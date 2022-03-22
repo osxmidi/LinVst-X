@@ -276,7 +276,7 @@ public:
   struct ParamState {
   float value;
   float valueupdate;
-  int changed;
+  char changed;
   };
 #endif
 
