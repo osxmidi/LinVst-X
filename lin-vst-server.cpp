@@ -3214,7 +3214,7 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
 
   startok = 0;
 
-  *ptr = 470;
+  *ptr = 472;
 
   for (int i = 0; i < 400000; i++) {
     if ((*ptr == 2) || (*ptr == 3)) {
@@ -3837,9 +3837,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
   cerr << "Copyright (c) 2004-2006 Chris Cannam" << endl;
 #ifdef EMBED
 #ifdef VST32SERVER
-  cerr << "LinVst-X version 4.7-32bit" << endl;
+  cerr << "LinVst-X version 4.7.2-32bit" << endl;
 #else
-  cerr << "LinVst-X version 4.7-64bit" << endl;
+  cerr << "LinVst-X version 4.7.2-64bit" << endl;
 #endif
 #else
 #ifdef VST32SERVER
