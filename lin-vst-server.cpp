@@ -1266,7 +1266,7 @@ void RemoteVSTServer::process(float **inputs, float **outputs,
   struct ParamState {
   float value;
   float valueupdate;
-  int changed;
+  char changed;
   };
 */
    
@@ -1300,7 +1300,7 @@ void RemoteVSTServer::processdouble(double **inputs, double **outputs,
   struct ParamState {
   float value;
   float valueupdate;
-  int changed;
+  char changed;
   };
 */
    
