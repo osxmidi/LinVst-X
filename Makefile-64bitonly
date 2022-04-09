@@ -2,7 +2,7 @@
 # Makefile for LinVst #
 
 CXX     = g++
-WINECXX = wineg++
+WINECXX = wineg++ -Wl,--subsystem,windows 
 
 CXX_FLAGS =
 
