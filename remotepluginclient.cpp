@@ -695,7 +695,15 @@ RemotePluginClient::RemotePluginClient(audioMasterCallback theMaster,
 }
 
 RemotePluginClient::~RemotePluginClient() {
-  if (m_runok == 0) {
+int pidval, wstatus;
+    for (int i = 0; i < 50000; i++) {
+    pidval = waitpid(-1, &wstatus, WNOHANG|WUNTRACED);
+    if (pidval <= 0)
+    break;
+    usleep(100);
+    }
+	
+    if (m_runok == 0) {
     m_threadbreak = 1;
     waitForClientexit();
     waitForServer2exit();
@@ -995,12 +1003,6 @@ VstIntPtr RemotePluginClient::dispatchproc(AEffect *effect, VstInt32 opcode,
     }
     
     plugin->effVoidOp(effClose);
-
-//#ifndef BITWIG
-//    wait(NULL);
-//    int wstatus;
-//    waitpid(-1, &wstatus, WUNTRACED);
-//#endif
 		  
     delete plugin;
     break;
