@@ -3214,6 +3214,10 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
 
   loaderr = 0;
 
+   struct sched_param param;
+   param.sched_priority = 0;
+   (void)sched_setscheduler(0, SCHED_OTHER, &param);
+
   string deviceName = libname;
   size_t foundext = deviceName.find_last_of(".");
   deviceName = deviceName.substr(0, foundext);
