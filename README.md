@@ -124,6 +124,15 @@ To enable 32 bit vst's on a 64 bit system, a distro's multilib needs to be insta
 
 Also, see the Tested VST's folder at https://github.com/osxmidi/LinVst/tree/master/Tested-VST-Plugins for some vst plugin setups and possible tips.
 
+**Hyperthreading**
+
+For Reaper, in Options/Preferences/Buffering uncheck Auto-detect the number of needed audio processing threads and set 
+Audio reading/processing threads to the amount of physical cores of the cpu (not virtual cores such as hyperthreading cores).
+
+This can help with stutters and rough audio response.
+
+Other Daws might have similar settings.
+
 **Renoise**
 
 Sometimes a synth vst might not declare itself as a synth and Renoise might not enable it.
