@@ -3210,13 +3210,13 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   char lpbuf42[512]; 
   sprintf(lpbuf42, "%d", idx);  
   string lpbuf4 = "create5";
-  lpbuf4 = lpbuf4 + lpbuf42;                 
-
-  loaderr = 0;
+  lpbuf4 = lpbuf4 + lpbuf42;    
 
    struct sched_param param;
    param.sched_priority = 0;
-   (void)sched_setscheduler(0, SCHED_OTHER, &param);
+   (void)sched_setscheduler(0, SCHED_OTHER, &param);             
+
+  loaderr = 0;
 
   string deviceName = libname;
   size_t foundext = deviceName.find_last_of(".");
