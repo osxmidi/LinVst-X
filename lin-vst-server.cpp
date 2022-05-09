@@ -3681,6 +3681,9 @@ DWORD retprocID;
 
   if(fidx < 0)
   return;
+
+  if(!remoteVSTServerInstance2[fidx])
+  return;
 	
   if(remoteVSTServerInstance2[fidx]->guiVisible == false)
   return;	
