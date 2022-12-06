@@ -279,7 +279,7 @@ public:
 
   static DWORD WINAPI AudioThreadMain(void *parameter) {
     RemoteVSTServer *remote1 = (RemoteVSTServer *)parameter;
-
+/*
       struct sched_param param;
       param.sched_priority = 1;
 
@@ -289,7 +289,7 @@ public:
       {
           perror("Failed to set realtime priority for audio thread");
       }
-
+*/
     while (!remote1->exiting) {
       remote1->dispatchProcess(5);
     }
@@ -333,11 +333,11 @@ char mret;
           perror("Failed to set realtime priority for audio thread");
       }
   */
-
+/*
    struct sched_param param;
    param.sched_priority = 0;
    (void)sched_setscheduler(0, SCHED_OTHER, &param);
-
+*/
   while (!remote2->exiting) {
   
   if(remote2->dodragwin == 1)
@@ -649,7 +649,7 @@ char mret;
 
   static DWORD WINAPI ParThreadMain(void *parameter) {
     RemoteVSTServer *remote3 = (RemoteVSTServer *)parameter;
-
+/*
       struct sched_param param;
       param.sched_priority = 1;
 
@@ -659,7 +659,7 @@ char mret;
       {
           perror("Failed to set realtime priority for audio thread");
       }
-
+*/
     while (!remote3->exiting) {
       remote3->dispatchPar(5);
     }
@@ -673,7 +673,7 @@ char mret;
   
   static DWORD WINAPI ControlThreadMain(void *parameter) {
     RemoteVSTServer *remote3 = (RemoteVSTServer *)parameter;
-
+/*
       struct sched_param param;
       param.sched_priority = 1;
 
@@ -683,7 +683,7 @@ char mret;
       {
           perror("Failed to set realtime priority for audio thread");
       }
-
+*/
     while (!remote3->exiting) {
       remote3->dispatchControl2(5);
     }
@@ -3215,8 +3215,8 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   lpbuf4 = lpbuf4 + lpbuf42;    
 
    struct sched_param param;
-   param.sched_priority = 0;
-   (void)sched_setscheduler(0, SCHED_OTHER, &param);             
+   param.sched_priority = 1;
+   (void)sched_setscheduler(0, SCHED_FIFO, &param);             
 
   loaderr = 0;
 
@@ -3897,15 +3897,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
   cerr << "Copyright (c) 2004-2006 Chris Cannam" << endl;
 #ifdef EMBED
 #ifdef VST32SERVER
-  cerr << "LinVst-X version 4.7.7-32bit" << endl;
+  cerr << "LinVst-X version 4.7.8-32bit" << endl;
 #else
-  cerr << "LinVst-X version 4.7.7-64bit" << endl;
+  cerr << "LinVst-X version 4.7.8-64bit" << endl;
 #endif
 #else
 #ifdef VST32SERVER
-  cerr << "LinVst-X version 4.7.7st-32bit" << endl;
+  cerr << "LinVst-X version 4.7.8st-32bit" << endl;
 #else
-  cerr << "LinVst-X version 4.7.7st-64bit" << endl;
+  cerr << "LinVst-X version 4.7.8st-64bit" << endl;
 #endif
 #endif
 
@@ -3941,8 +3941,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
   }
 
    struct sched_param param;
-   param.sched_priority = 0;
-   (void)sched_setscheduler(0, SCHED_OTHER, &param);
+   param.sched_priority = 1;
+   (void)sched_setscheduler(0, SCHED_FIFO, &param);
 
   threadargs args2;
   threadargs *args;
