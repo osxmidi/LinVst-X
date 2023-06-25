@@ -12,11 +12,10 @@ BIN_DIR    = $(DESTDIR)$(PREFIX)/bin
 VST_DIR = ./vst
 
 BUILD_FLAGS  = -fPIC -O2 -DLVRT -DVST6432 -DEMBED -DEMBEDDRAG -DWAVES -DVESTIGE -DNEWTIME -DINOUTMEM -DCHUNKBUF -DTRACKTIONWM -DEMBEDRESIZE -DPCACHE $(CXX_FLAGS)
-# add -DNOFOCUS to the above line for alternative keyboard/mouse focus operation, add -DEMBEDRESIZE to the above line for window resizing
+
 BUILD_FLAGS_WIN = -m64 -O2 -DVST6432 -DEMBED -DEMBEDDRAG -DWAVES -DVESTIGE -DNEWTIME -DINOUTMEM -DCHUNKBUF -DTRACKTIONWM -DEMBEDRESIZE -DPCACHE -DDRAGWIN -I/opt/wine-staging/include/wine/windows -I/opt/wine-stable/include/wine/windows -I/opt/wine-devel/include/wine/windows -I/usr/include/wine-development/windows -I/usr/include/wine-development/wine/windows -I/usr/include/wine/wine/windows
-# add -DEMBEDRESIZE to the above line for window resizing
 BUILD_FLAGS_WIN32 = -m32 -O2 -DVST6432 -DEMBED -DEMBEDDRAG -DWAVES -DVESTIGE -DNEWTIME -DINOUTMEM -DCHUNKBUF -DVST32SERVER -DTRACKTIONWM -DEMBEDRESIZE -DPCACHE -DDRAGWIN -I/opt/wine-staging/include/wine/windows -I/opt/wine-stable/include/wine/windows -I/opt/wine-devel/include/wine/windows -I/usr/include/wine-development/windows -I/usr/include/wine-development/wine/windows -I/usr/include/wine/wine/windows
-# add -DEMBEDRESIZE to the above line for window resizing
+# add -DNOFOCUS to the above lines for alternative keyboard/mouse focus operation
 
 LINK_FLAGS   = $(LDFLAGS)
 
