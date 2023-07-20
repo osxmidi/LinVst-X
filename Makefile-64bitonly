@@ -32,7 +32,7 @@ linvstx.so: linvst.unix.o remotepluginclient.unix.o paths.unix.o
 	$(CXX) $^ $(LINK_PLUGIN) -o $@
 	
 lin-vst-server-x.exe: lin-vst-server.wine.o remotepluginserver.wine.o paths.wine.o
-	$(WINECXX) -m64 $^ $(LINK_WINE) -o $@
+	$(WINECXX) $^ $(LINK_WINE) -o $@
 
 # --------------------------------------------------------------
 
