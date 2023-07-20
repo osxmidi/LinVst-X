@@ -36,11 +36,11 @@ linvstx.so: linvst.unix.o remotepluginclient.unix.o paths.unix.o
 	$(CXX) $^ $(LINK_PLUGIN) -o $@
 	
 lin-vst-server-x.exe: lin-vst-server.wine.o remotepluginserver.wine.o paths.wine.o
-	$(WINECXX) -m64 $^ $(LINK_WINE) -o $@
+	$(WINECXX) $^ $(LINK_WINE) -o $@
 
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 lin-vst-server-x32.exe: lin-vst-server.wine32.o remotepluginserver.wine32.o paths.wine32.o
-	$(WINECXX) -m32 $^ $(LINK_WINE32) -o $@
+	$(WINECXX) $^ $(LINK_WINE32) -o $@
 else
 lin-vst-server-x32.exe:
 endif
