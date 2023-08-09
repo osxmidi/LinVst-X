@@ -5,6 +5,7 @@
    #include <gtk/gtk.h>
    #include <string.h>
    #include <fts.h>
+   #include <bits/stdc++.h>
 
    gchar *folderpath;
    gchar *filepath;
@@ -14,12 +15,31 @@
    int filecopy = 0;
 
    int intimer = 0;
+   int dofullup = 0;
+   int vst2filehit = 0;
+
+   size_t find_last(std::string searchstr, std::string searcharg)
+   {
+   size_t foundret = 0;
+   size_t found = searchstr.find(searcharg, 0);
+   foundret = found;
+ 
+   while(found != std::string::npos)
+   {
+   found += searcharg.size();
+   found = searchstr.find(searcharg, found);
+   if(found != std::string::npos)
+   foundret = found;
+   }
+   return foundret;
+   }
 
    int doconvert(char *linvst, char folder[])
    {
    DIR *dirlist;
    struct dirent *dentry;
    std::string convertname;
+   std::string convertnamecase;
    std::string cfolder;
    char *folderpath[] = {folder, 0};
 
@@ -48,33 +68,48 @@
     else if (node->fts_info & FTS_F) 
     convertname = node->fts_path;
     else continue;
-   
-    if(convertname.find(".dll") != std::string::npos)
-    {
-    convertname.replace(convertname.begin() + convertname.find(".dll"), convertname.end(), ".so");
+    convertnamecase = convertname;
+    transform(convertnamecase.begin(), convertnamecase.end(), convertnamecase.begin(), ::tolower);
+	vst2filehit = 0;
+
+    if(convertnamecase.find(".dll") != std::string::npos)
+	{
+    int fulllength = strlen(convertnamecase.c_str());
+    if((convertnamecase[fulllength - 1] == 'l') && (convertnamecase[fulllength - 2] == 'l') && (convertnamecase[fulllength - 3] == 'd') && (convertnamecase[fulllength - 4] == '.'))
+    {    
+    size_t position = find_last(convertnamecase, ".dll");
+    if(position != 0)
+    convertname.replace(convertname.begin() + position, convertname.end(), ".so");
+    vst2filehit = 1;
+	}	
     }
-    else if(convertname.find(".Dll") != std::string::npos)
+
+	if(vst2filehit == 1)
+	{
+    if(dofullup == 1)
     {
-    convertname.replace(convertname.begin() + convertname.find(".Dll"), convertname.end(), ".so");
-    }
-    else if(convertname.find(".DLL") != std::string::npos)
-    {
-    convertname.replace(convertname.begin() + convertname.find(".DLL"), convertname.end(), ".so");
+    std::string sourcename = linvst;
+    std::ifstream source(sourcename.c_str(), std::ios::binary);      
+    std::ofstream dest(convertname.c_str(), std::ios::binary);
+    dest << source.rdbuf();
+    source.close();
+    dest.close();	
     }
     else
-    continue;
-
+    {
+    test = std::ifstream(convertname).good();
+   
+    if(!test)
+    {
     std::string sourcename = linvst;
-
-    std::ifstream source(sourcename.c_str(), std::ios::binary);
-      
+    std::ifstream source(sourcename.c_str(), std::ios::binary);      
     std::ofstream dest(convertname.c_str(), std::ios::binary);
-
     dest << source.rdbuf();
-
     source.close();
-    dest.close();
-        
+    dest.close();	
+	}	
+    }
+    }
     }
 
    if(fs)
@@ -122,7 +157,18 @@ filehit = 1;
 gboolean dolabelupdate(gpointer data)
 {
 
- gtk_button_set_label(GTK_BUTTON (data), "Start");
+ gtk_button_set_label(GTK_BUTTON (data), "Update Newly Added Plugins");
+
+ intimer = 0;
+
+ return FALSE;
+
+}
+
+gboolean dolabelupdate2(gpointer data)
+{
+
+ gtk_button_set_label(GTK_BUTTON (data), "Update All Plugins (Upgrade All Plugins)");
 
  intimer = 0;
 
@@ -184,15 +230,72 @@ void buttoncallback(GtkFileChooser *button, gpointer data)
 
 }
 
+void buttoncallback2(GtkFileChooser *button, gpointer data)
+{
+ std::string name;
+
+ if((filehit == 1) && (folderhit == 1) && (intimer == 0))
+ {
+ 
+ name = filepath;
+ 
+ if(name.find("linvstx.so") == std::string::npos)
+ {
+ gtk_button_set_label(GTK_BUTTON (button), "Not Found");
+
+ filecopy = 0;
+ filehit = 0;
+ folderhit = 0;
+
+ intimer = 1;
+
+ g_timeout_add_seconds(3, dolabelupdate2, (GtkWidget *)data);
+
+ return;
+ }
+
+ dofullup = 1;
+
+ if(doconvert(filepath, folderpath) == 1)
+ {
+ gtk_button_set_label(GTK_BUTTON (button), "Not Found");
+
+ filecopy = 0;
+ filehit = 0;
+ folderhit = 0;
+ dofullup = 0;
+
+ intimer = 1;
+
+ g_timeout_add_seconds(3, dolabelupdate2, (GtkWidget *)data);
+
+ return;
+ }
+ 
+ filecopy = 0;
+ filehit = 1;
+ folderhit = 0;
+ dofullup = 0;
+
+ gtk_button_set_label(GTK_BUTTON (button), "Done");
+
+ intimer = 1;
+
+ g_timeout_add_seconds(3, dolabelupdate2, (GtkWidget *)data);
+
+}
+}
+
+
 int main (int argc, char *argv[])
 {
-  GtkWidget *window, *folderselect, *fileselect, *spacertext, *spacertext2, *spacertext3, *vbox, *button;
+  GtkWidget *window, *folderselect, *fileselect, *spacertext, *spacertext2, *spacertext3, *vbox, *button, *button2;
   GtkFileFilter *extfilter;
 
   gtk_init (&argc, &argv);
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size (GTK_WINDOW (window), 300, 300); 
+  gtk_window_set_default_size (GTK_WINDOW (window), 600, 300); 
   gtk_window_set_title (GTK_WINDOW (window), "LinVst-X");
   gtk_container_set_border_width (GTK_CONTAINER (window), 8);
 
@@ -204,7 +307,10 @@ int main (int argc, char *argv[])
   fileselect = gtk_file_chooser_button_new ("Choose linvstx.so", GTK_FILE_CHOOSER_ACTION_OPEN);
 
   button = gtk_button_new ();
-  gtk_button_set_label(GTK_BUTTON (button), "Start");
+  gtk_button_set_label(GTK_BUTTON (button), "Update Newly Added Plugins");
+
+  button2 = gtk_button_new ();
+  gtk_button_set_label(GTK_BUTTON (button2), "Update All Plugins (Upgrade All Plugins)");
 
   vbox = gtk_vbox_new (FALSE, 8);
   gtk_box_pack_start(GTK_BOX (vbox), spacertext, FALSE, FALSE, 0);
@@ -213,11 +319,13 @@ int main (int argc, char *argv[])
   gtk_box_pack_start(GTK_BOX (vbox), folderselect, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX (vbox), spacertext3, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX (vbox), button, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX (vbox), button2, FALSE, FALSE, 0);
 
   g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (quitcallback), NULL);
   g_signal_connect (G_OBJECT (folderselect), "selection_changed", G_CALLBACK (foldercallback), NULL);
   g_signal_connect (G_OBJECT (fileselect), "selection_changed", G_CALLBACK (filecallback), NULL);
   g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (buttoncallback), button);
+  g_signal_connect (G_OBJECT (button2), "clicked", G_CALLBACK (buttoncallback2), button2);
 
   gtk_file_chooser_set_show_hidden(GTK_FILE_CHOOSER(folderselect), TRUE);
   gtk_file_chooser_set_show_hidden(GTK_FILE_CHOOSER(fileselect), TRUE);
