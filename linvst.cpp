@@ -92,17 +92,15 @@ VST_EXPORT AEffect *VSTPluginMain(audioMasterCallback audioMaster) {
     return 0;
   }
 
-  try {
+//  try {
     plugin = new RemotePluginClient(audioMaster, info);
-  } catch (std::string e) {
+//  } catch (std::string e) {
+    if(!plugin)
+    {
     std::cerr << "Could not connect to Server" << std::endl;
     errwin2();
-    if (plugin) {
-      plugin->m_runok = 1;
-      delete plugin;
-    }
     return 0;
-  }
+    }
 
   if (plugin->m_runok == 1) {
     std::cerr << "LinVst Error: lin-vst-server not found or vst dll load "
