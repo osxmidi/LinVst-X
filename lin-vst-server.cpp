@@ -4236,12 +4236,23 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
 
               getinstance = (VstEntry)GetProcAddress(
                   remoteVSTServerInstance2[pidx]->libHandle,
-                  NEW_PLUGIN_ENTRY_POINT);
+                  "VSTPluginMain");
 
-              if (!getinstance) {
-                getinstance = (VstEntry)GetProcAddress(
-                    remoteVSTServerInstance2[pidx]->libHandle,
-                    OLD_PLUGIN_ENTRY_POINT);
+              if (!getinstance)
+              getinstance = (VstEntry)GetProcAddress(
+                  remoteVSTServerInstance2[pidx]->libHandle,
+                  "main");
+
+              if (!getinstance)
+              getinstance = (VstEntry)GetProcAddress(
+                  remoteVSTServerInstance2[pidx]->libHandle,
+                  "Main");
+
+              if (!getinstance)
+              getinstance = (VstEntry)GetProcAddress(
+                  remoteVSTServerInstance2[pidx]->libHandle,
+                  "MAIN");		    	    
+		      
                 if (!getinstance) {
                   cerr << "dssi-vst-server: ERROR: VST entrypoints \""
                        << NEW_PLUGIN_ENTRY_POINT << "\" or \""
@@ -4253,7 +4264,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                   SetEvent(remoteVSTServerInstance2[pidx]->ghWriteEvent6);
                   break;
                 }
-               }
                
               remoteVSTServerInstance2[pidx]->m_plugin =
                   getinstance(hostCallback3);
