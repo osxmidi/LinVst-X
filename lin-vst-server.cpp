@@ -510,8 +510,9 @@ char mret;
 
   if(remote2->dndfinish == 1)
   {
-  XFlush(remote2->display); 
   remote2->dodragwin = 0;
+  XSetSelectionOwner(remote2->display, remote2->XdndSelection, 0, CurrentTime); 
+  XFlush(remote2->display); 
   remote2->pwindow = 0;          		
   remote2->window = 0;		
   remote2->xdndversion = -1;				
@@ -588,10 +589,10 @@ char mret;
   if(remote2->proxyptr)
   XSendEvent(remote2->display, remote2->proxyptr, False, NoEventMask, (XEvent*)&xdndclient);
   else
-  XSendEvent(remote2->display, remote2->pwindow, False, NoEventMask, (XEvent*)&xdndclient);
+   XSendEvent(remote2->display, remote2->pwindow, False, NoEventMask, (XEvent*)&xdndclient);
+  remote2->dodragwin = 0; 
+  XSetSelectionOwner(remote2->display, remote2->XdndSelection, 0, CurrentTime); 
   XFlush(remote2->display); 
-				
-  remote2->dodragwin = 0;   
   remote2->pwindow = 0;          		
   remote2->window = 0;		
   remote2->xdndversion = -1;				
@@ -721,6 +722,8 @@ char mret;
 
   HWND hWnd;
   WNDCLASSEX wclass;
+  int virtx;
+  int virty;  
 #ifdef TRACKTIONWM
   WNDCLASSEX wclass2;
   POINT offset;
@@ -919,7 +922,7 @@ dodragwin(0), drag_win(0), pwindow(0), window(0), xdndversion(-1), data(0), data
       haveGui(true), timerval(0), exiting(false), effectrun(false),
       inProcessThread(false), guiVisible(false), parfin(0), audfin(0),
       getfin(0), confin(0), guiupdate(0), guiupdatecount(0), guiresizewidth(500),
-      guiresizeheight(200), melda(0), hWnd(0), hidegui(0),
+      guiresizeheight(200), melda(0), hWnd(0), hidegui(0), virtx(0), virty(0),
       ghWriteEvent(0), ghWriteEvent2(0), ghWriteEvent3(0), ghWriteEvent4(0),
       ghWriteEvent5(0), ghWriteEvent6(0), ghWriteEvent7(0), ghWriteEvent8(0), ghWriteEvent9(0), libHandle(0), m_plugin(0), pidx(0),
       plugerr(0), 
@@ -1285,6 +1288,9 @@ void RemoteVSTServer::EffectOpen(ShmControl *m_shmControlptr) {
 
 
  // m_plugin->dispatcher(m_plugin, effMainsChanged, 0, 1, NULL, 0);
+ 
+  virtx = GetSystemMetrics(SM_XVIRTUALSCREEN);
+  virty = GetSystemMetrics(SM_YVIRTUALSCREEN);
 
   effectrun = true;
 }
@@ -1840,7 +1846,24 @@ void RemoteVSTServer::eventloop()
       XSync(display, false);
       
  //    }      
-      reparentdone = 1;      
+      reparentdone = 1;  
+      
+#ifdef TRACKTIONWM
+ 			 if (hosttracktion == 1) {
+ 				 SetWindowPos(hWndvst[pidx], HWND_TOP,
+                 virtx + offset.x,
+                 virty + offset.y,
+                 rect->right - rect->left, rect->bottom - rect->top, 0);
+ 			 } else {
+  				 SetWindowPos(hWndvst[pidx], HWND_TOP, virtx,
+                 virty, rect->right - rect->left,
+                 rect->bottom - rect->top, 0);
+  }
+#else
+ 				 SetWindowPos(hWndvst[pidx], HWND_TOP, virtx,
+           		 virty, rect->right - rect->left,
+                 rect->bottom - rect->top, 0);
+#endif          
       }
       break;
 
@@ -1868,13 +1891,6 @@ void RemoteVSTServer::eventloop()
         //     if(mapped2)
         //    {
         if (e.xcrossing.focus == False) { 
-#ifdef DRAGWIN   
-        if(drag_win && display)   
-        {        
-        XSetSelectionOwner(display, XdndSelection, 0, CurrentTime); 
-        XSetSelectionOwner(display, XdndSelection, drag_win, CurrentTime);
-        }
-#endif        
         fidx = pidx;          
         XSetInputFocus(display, child, RevertToPointerRoot, CurrentTime);
           //    XSetInputFocus(display, child, RevertToParent,
@@ -3823,9 +3839,13 @@ DWORD retprocID;
   ienum->Release(); 
   if(cfdrop != 0)
   {
+  if(remoteVSTServerInstance2[fidx]->drag_win && remoteVSTServerInstance2[fidx]->display)   
+  {  
+  XSetSelectionOwner(remoteVSTServerInstance2[fidx]->display, remoteVSTServerInstance2[fidx]->XdndSelection, remoteVSTServerInstance2[fidx]->drag_win, CurrentTime);
   remoteVSTServerInstance2[fidx]->dodragwin = 1;
   }
   }       
+  }
   }
   }
   }
@@ -4084,25 +4104,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
                 break;
               }
               
-#ifdef TRACKTIONWM
- 			 if (remoteVSTServerInstance2[pidx]->hosttracktion == 1) {
- 				 SetWindowPos(hWndvst[pidx], HWND_TOP,
-                 GetSystemMetrics(SM_XVIRTUALSCREEN) + remoteVSTServerInstance2[pidx]->offset.x,
-                 GetSystemMetrics(SM_YVIRTUALSCREEN) + remoteVSTServerInstance2[pidx]->offset.y,
-                 remoteVSTServerInstance2[pidx]->rect->right - remoteVSTServerInstance2[pidx]->rect->left, remoteVSTServerInstance2[pidx]->rect->bottom - remoteVSTServerInstance2[pidx]->rect->top, 0);
- 			 } else {
-  				 SetWindowPos(hWndvst[pidx], HWND_TOP, GetSystemMetrics(SM_XVIRTUALSCREEN),
-                 GetSystemMetrics(SM_YVIRTUALSCREEN), remoteVSTServerInstance2[pidx]->rect->right - remoteVSTServerInstance2[pidx]->rect->left,
-                 remoteVSTServerInstance2[pidx]->rect->bottom - remoteVSTServerInstance2[pidx]->rect->top, 0);
-  }
-#else
- 				 SetWindowPos(hWndvst[pidx], HWND_TOP, GetSystemMetrics(SM_XVIRTUALSCREEN),
-           		 GetSystemMetrics(SM_YVIRTUALSCREEN), remoteVSTServerInstance2[pidx]->rect->right - remoteVSTServerInstance2[pidx]->rect->left,
-                 remoteVSTServerInstance2[pidx]->rect->bottom - remoteVSTServerInstance2[pidx]->rect->top, 0);
-#endif
-
-
-
  				 remoteVSTServerInstance2[pidx]->winm->width = remoteVSTServerInstance2[pidx]->rect->right - remoteVSTServerInstance2[pidx]->rect->left;
   				 remoteVSTServerInstance2[pidx]->winm->height = remoteVSTServerInstance2[pidx]->rect->bottom - remoteVSTServerInstance2[pidx]->rect->top;
                  remoteVSTServerInstance2[pidx]->winm->handle = (long int)GetPropA(hWndvst[pidx], "__wine_x11_whole_window");
