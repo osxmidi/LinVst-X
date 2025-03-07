@@ -2264,7 +2264,7 @@ void RemoteVSTServer::showGUI(ShmControl *m_shmControlptr) {
       return;
       }  
       
-      reparentdone = 0;      
+  //    reparentdone = 0;      
       
       XSync(display, false);      
 
@@ -4118,7 +4118,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
 #endif
 
      if(remoteVSTServerInstance2[pidx]->display && remoteVSTServerInstance2[pidx]->child)
+     {
+     XUnmapWindow(remoteVSTServerInstance2[pidx]->display, remoteVSTServerInstance2[pidx]->child);
      XReparentWindow(remoteVSTServerInstance2[pidx]->display, remoteVSTServerInstance2[pidx]->child, XDefaultRootWindow(remoteVSTServerInstance2[pidx]->display), 0, 0);
+     }
 
       XSync(remoteVSTServerInstance2[pidx]->display, false);                  
               
