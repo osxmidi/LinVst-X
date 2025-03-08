@@ -1000,6 +1000,7 @@ LRESULT CALLBACK RemoteVSTServer::realWndProc(HWND hWnd, UINT msg,
     break;
 
   case WM_TIMER:
+    if (!exiting && m_plugin)   	  
     eventloop();
     break;
 
@@ -4337,7 +4338,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdlinexxx,
               
               if((remoteVSTServerInstance2[valt]->hostreaper == 1) && (remoteVSTServerInstance2[valt]->pparent == 0) && (remoteVSTServerInstance2[valt]->reaptimecount < 100))
               remoteVSTServerInstance2[valt]->guiUpdate();
-                      
+                if(remoteVSTServerInstance2[valt]->m_plugin)        
                 remoteVSTServerInstance2[valt]->m_plugin->dispatcher(
                     remoteVSTServerInstance2[valt]->m_plugin, effEditIdle, 0, 0,
                     NULL, 0);
