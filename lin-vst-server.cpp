@@ -1839,7 +1839,7 @@ void RemoteVSTServer::eventloop()
       XSelectInput(display, pparent, StructureNotifyMask | SubstructureNotifyMask);
       parentok = 1;
       }
-      XSelectInput(display, parent, SubstructureRedirectMask | StructureNotifyMask | SubstructureNotifyMask);
+      XSelectInput(display, parent, StructureNotifyMask | SubstructureNotifyMask);
       XSelectInput(display, child, EnterWindowMask | LeaveWindowMask | PropertyChangeMask);
 #else
       if((pparent != 0) && (pparent != parent))
@@ -1847,7 +1847,7 @@ void RemoteVSTServer::eventloop()
       XSelectInput(display, pparent, StructureNotifyMask | SubstructureNotifyMask);
       parentok = 1;
       }
-      XSelectInput(display, parent, SubstructureRedirectMask | StructureNotifyMask | SubstructureNotifyMask);
+      XSelectInput(display, parent, StructureNotifyMask | SubstructureNotifyMask);
       XSelectInput(display, child, EnterWindowMask | LeaveWindowMask | PropertyChangeMask);
 #endif
       
