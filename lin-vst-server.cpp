@@ -291,7 +291,7 @@ public:
       }
 */
     while (!remote1->exiting) {
-      remote1->dispatchProcess(5);
+      remote1->dispatchProcess(20);
     }
     // param.sched_priority = 0;
     // (void)sched_setscheduler(0, SCHED_OTHER, &param);
@@ -637,7 +637,7 @@ char mret;
   } 
   #else
      while (!remote2->exiting) {
-      remote2->dispatchPar(5);
+      remote2->dispatchPar(20);
     }  
   #endif   
     // param.sched_priority = 0;
@@ -662,7 +662,7 @@ char mret;
       }
 */
     while (!remote3->exiting) {
-      remote3->dispatchPar(5);
+      remote3->dispatchPar(20);
     }
     // param.sched_priority = 0;
     // (void)sched_setscheduler(0, SCHED_OTHER, &param);
@@ -686,7 +686,7 @@ char mret;
       }
 */
     while (!remote3->exiting) {
-      remote3->dispatchControl2(5);
+      remote3->dispatchControl2(20);
     }
     // param.sched_priority = 0;
     // (void)sched_setscheduler(0, SCHED_OTHER, &param);
@@ -3530,7 +3530,7 @@ if(remoteVSTServerInstance2[idx]->exiting)
 break;
 */
 
-    remoteVSTServerInstance2[idx]->dispatchControl(5);
+    remoteVSTServerInstance2[idx]->dispatchControl(20);
   }
 
   // remoteVSTServerInstance2[pidx]->m_plugin->resvd2 = 0;
