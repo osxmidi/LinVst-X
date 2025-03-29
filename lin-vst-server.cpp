@@ -3210,6 +3210,8 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   string lpbuf4 = "create5";
   lpbuf4 = lpbuf4 + lpbuf42;    
 
+  HRESULT oleret = OleInitialize(NULL);	
+
    struct sched_param param;
    param.sched_priority = 1;
    (void)sched_setscheduler(0, SCHED_FIFO, &param);             
@@ -3643,7 +3645,10 @@ remoteVSTServerInstance2[idx]->parfin &&
 
   realplugincount--;
     
-  sched_yield();   
+  sched_yield();  
+
+  if(oleret == S_OK)
+  OleUninitialize();		
 
   //    ExitThread(0);
 
