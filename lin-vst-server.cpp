@@ -3210,6 +3210,8 @@ DWORD WINAPI VstThreadMain(LPVOID parameter) {
   string lpbuf4 = "create5";
   lpbuf4 = lpbuf4 + lpbuf42;    
 
+  SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);	
+
   HRESULT oleret = OleInitialize(NULL);	
 
    struct sched_param param;
